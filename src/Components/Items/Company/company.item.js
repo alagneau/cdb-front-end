@@ -5,15 +5,27 @@ import CardActions from '@material-ui/core/CardActions';
 import './company.item.css';
 
 function CompanyItem(props) {
+    const [edit, setEdit] = useState(props.edit);
     const [company, setCompany] = useState(props.company);
+
+    const updateInputValue = (e) => {
+        let copy = { ...company };
+        copy[e.target.name] = e.target.value;
+        setCompany(copy);
+      }
 
     return (
         <Card className="card fade-in example-card">
             <CardContent>
-                {company.name}
+                {edit
+                    ? <input type="text" defaultValue={company.name} name="name" type="text" onChange={(e) => updateInputValue(e)} />
+                    : <p className="mat-card-header">
+                        {company.name}
+                    </p>}
             </CardContent>
             <CardActions>
-                <button onClick={() => props.onDelete(props.company.id)}>Delete</button>
+                <button onClick={() => setEdit(!edit)}>Edit</button>
+                <button onClick={() => props.onDelete(props.company)}>Delete</button>
             </CardActions>
         </Card>
     );
