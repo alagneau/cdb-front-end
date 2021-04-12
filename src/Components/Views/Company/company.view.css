@@ -1,0 +1,40 @@
+.header {
+    overflow: hidden;
+    top: 0;
+    width: 100%;
+    padding: 10px;
+    font-size: 30px;
+    background-color: #4caf50;
+    color: white;
+    font-weight: bold;
+    font-family: "Courier New", monospace;
+    text-align: center;
+}
+
+button {
+    margin-left: 15px;
+    background-color: white;
+    border: none;
+    color: #4caf50;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    border: 2px solid white;
+    font-family: "Courier New", monospace;
+}
+
+button:hover {
+    background-color: #4caf50;
+    color: white;
+    border: 2px solid white;
+}
+
+.test {
+    display: flex;
+}
+
+.menu {
+    margin: 10%;
+}
