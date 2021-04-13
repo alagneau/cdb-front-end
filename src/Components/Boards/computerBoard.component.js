@@ -24,6 +24,20 @@ export default function ComputerBoard(props) {
         }
     }
 
+    const handleEdit = (computerEdited) => {
+        let copy = [...computers];
+        copy.filter(computer => {
+            if ( computer.id === computerEdited.id ) {
+                for (var field in computer) {
+                    computer[field] = computerEdited[field];
+                }
+            }
+        })
+        setComputers(copy);
+        console.log("computerBoard --> handleEdit --> computers:");
+        console.log(computers);
+    }    
+
     const handleDeleteSelection = () => {
         if ( checkall ) {
             setComputers([]);
@@ -40,12 +54,18 @@ export default function ComputerBoard(props) {
         let copyComputers = [...computers];
         copyComputers.splice(copyComputers.indexOf(computer), 1);
         setComputers(copyComputers);
+        
+        console.log("computerBoard --> handleDelete --> computers:");
+        console.log(computers);
 
         if ( computersToDelete.includes(computer) ) {
             let copyComputersToDelete = [...computersToDelete];
             copyComputersToDelete.splice(copyComputersToDelete.indexOf(computer), 1);
             setComputersToDelete(copyComputersToDelete);
+            
         }
+        console.log("computer:");
+        console.log(computer);
     }
     
     const toggleCheckAll = (event) => {
@@ -53,17 +73,21 @@ export default function ComputerBoard(props) {
     }
 
     return (
-        <table>
+        <div>
+            <div align="right">
+                <button>New Computer</button>
+            </div>
+            <table>
             <thead>
                 <tr>
-                    <th>
-                        <input type="checkbox" onChange={toggleCheckAll}/>
-                        <DeleteForeverIcon fontSize="large" onClick={handleDeleteSelection} />
-                    </th>
                     <th>Computer name</th>
                     <th>Introduced date</th>
                     <th>Discontinued date</th>
                     <th>Company</th>
+                    <th>
+                        <input type="checkbox" onChange={toggleCheckAll}/>
+                        <DeleteForeverIcon fontSize="large" onClick={handleDeleteSelection} />
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -75,12 +99,14 @@ export default function ComputerBoard(props) {
                             pushComputerToDelete = {pushComputerToDelete}
                             takeOutComputerToDelete = {takeOutComputerToDelete}
                             handleDelete = {handleDelete}
+                            handleEdit = {handleEdit}
                             checkall = {checkall}
                         />
                     );
                 })}
             </tbody>
         </table>
+        </div>
     );
 
 
