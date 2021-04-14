@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Computer } from "../Models/computer.model"; // Le model n'est pas utilisé et je ne sais pas comment l'utiliser
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import EditIcon from '@material-ui/icons/Edit';
@@ -6,7 +7,11 @@ import EditIcon from '@material-ui/icons/Edit';
 
 export default function ComputerComponent(props) {
     const [computer, setComputer] = useState(props.computer);
+    const [isChecked, setIsChecked] = useState(props.isChecked);
     const [editMode, setEditMode] = useState(false);
+
+
+
 
     const handleClick = (event) => {
         if ( event.target.checked === true ) {
@@ -16,6 +21,9 @@ export default function ComputerComponent(props) {
             props.takeOutComputerToDelete(computer);
         }
     }
+
+
+
 
     const displayComputerField = (input, fieldName) => {
         return(
@@ -29,6 +37,9 @@ export default function ComputerComponent(props) {
         );
     }
 
+
+
+
     const displayCompanyField = (input, fieldName) => {
         return(
             <td>
@@ -41,12 +52,17 @@ export default function ComputerComponent(props) {
         );
     }
 
+
+
     const handleChangeComputerField = (event, fieldName) => {
         let computerModified = {...computer};
         computerModified[fieldName] = event.target.value;
         setComputer(computerModified);
         props.handleEdit(computerModified);
     }
+
+
+
 
     const handleChangeCompanyField = (event, fieldName) => {
         let computerModified = {...computer};
@@ -55,30 +71,69 @@ export default function ComputerComponent(props) {
         props.handleEdit(computerModified);
     }
 
-    const changeEditMode = () => {
-        let contrary = !editMode;
-        setEditMode(contrary);
-    }
+
+
     
     return (
         <tr>
-            {displayComputerField(computer.name, "name")}
-            {displayComputerField(computer.introduced, "introduced")}
-            {displayComputerField(computer.discontinued, "discontinued")}
-            {computer.company !== null ? 
-                displayCompanyField(computer.company.name, "name")
-                :
-                displayCompanyField(null, "name")
-            }
             <td>
-                {props.checkall ?
-                <input type="checkbox" name="cb" onClick={handleClick} checked />
-                :
-                <input type="checkbox" name="cb" onClick={handleClick} />
+                {editMode ?
+                    <input placeholder={computer.name} 
+                           size="15" 
+                           onChange={(event) => handleChangeComputerField(event, "name")}
+                    />
+                    :
+                    computer.name
+                }
+            </td>
+            <td>
+                {editMode ?
+                    <input placeholder={computer.introduced} 
+                           size="15" 
+                           onChange={(event) => handleChangeComputerField(event, "introduced")}
+                    />
+                    :
+                    computer.introduced
+                }
+            </td>
+            <td>
+                {editMode ?
+                    <input placeholder={computer.discontinued} 
+                           size="15" 
+                           onChange={(event) => handleChangeComputerField(event, "discontinued")}
+                    />
+                    :
+                    computer.discontinued
+                }
+            </td>
+            <td>
+                {editMode ?
+                    <input placeholder={computer.company !== null && computer.company.name} 
+                           size="15" 
+                           onChange={(event) => handleChangeCompanyField(event, "name")} 
+                    />
+                    :
+                    computer.company !== null && computer.company.name
+                }
+            </td>
+            <td>
+                {isChecked ?
+                    <input type="checkbox" name="cb" onClick={handleClick} checked />
+                    :
+                    <input type="checkbox" name="cb" onClick={handleClick} />
                 }
                 <DeleteOutlineOutlinedIcon onClick={() => props.handleDelete(computer)}/>
-                <EditIcon onClick={changeEditMode}/>
+                <EditIcon onClick={() => setEditMode(!editMode)}/>
             </td>
         </tr>
     );
 }
+
+ComputerComponent.propTypes = {
+    computer: PropTypes.object.isRequired,
+    pushComputerToDelete: PropTypes.func.isRequired,
+    takeOutComputerToDelete: PropTypes.func.isRequired,
+    handleDelete: PropTypes.func.isRequired,
+    handleEdit: PropTypes.func.isRequired,
+    isChecked: PropTypes.bool.isRequired
+};

@@ -3,10 +3,14 @@ import { MOCK_COMPUTERS } from "../../assets/Mock_Computer_CDB";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import ComputerComponent from "../Items/computer.component";
 
+import PropTypes from 'prop-types';
+
+
 export default function ComputerBoard(props) {
+   
     const [computers, setComputers] = useState(MOCK_COMPUTERS);
     const [computersToDelete, setComputersToDelete] = useState([]);
-    const [checkall, setCheckall] = useState(false);
+
 
     const pushComputerToDelete = (computer) => {
         if (!computersToDelete.includes(computer)) {
@@ -16,6 +20,8 @@ export default function ComputerBoard(props) {
         }
     }
 
+
+
     const takeOutComputerToDelete = (computer) => {
         if (computersToDelete.includes(computer)) {
             let copy = [...computersToDelete];
@@ -24,53 +30,75 @@ export default function ComputerBoard(props) {
         }
     }
 
+
+
     const handleEdit = (computerEdited) => {
-        let copy = [...computers];
-        copy.filter(computer => {
-            if ( computer.id === computerEdited.id ) {
-                for (var field in computer) {
-                    computer[field] = computerEdited[field];
-                }
-            }
-        })
-        setComputers(copy);
         console.log("computerBoard --> handleEdit --> computers:");
+        let copy = [...computers];
+        copy.splice(copy.indexOf(computers.find(comp => comp.id === computerEdited.id)), 1, computerEdited);
+        setComputers(copy);
+        console.log("computers");
         console.log(computers);
     }    
 
+
+
     const handleDeleteSelection = () => {
-        if ( checkall ) {
-            setComputers([]);
-        }
-        else {
-            let computersRemaining = computers.filter((computer) => {
-                return !computersToDelete.includes(computer);
-            })
-            setComputers(computersRemaining);
-        }
+        let computersRemaining = computers.filter( computer => {
+            return !computersToDelete.includes(computer);
+        });
+        setComputers(computersRemaining);
     }
+
+
   
     const handleDelete = (computer) => {
+        console.log("computerBoard --> handleDelete:");
         let copyComputers = [...computers];
-        copyComputers.splice(copyComputers.indexOf(computer), 1);
+        
+        let index = copyComputers.indexOf(computer);
+        console.log("index of computer to delete:");
+        console.log(index);
+
+        let computerDeleted = copyComputers.splice(index, 1);
         setComputers(copyComputers);
         
-        console.log("computerBoard --> handleDelete --> computers:");
+        console.log("computers:");
         console.log(computers);
 
         if ( computersToDelete.includes(computer) ) {
             let copyComputersToDelete = [...computersToDelete];
             copyComputersToDelete.splice(copyComputersToDelete.indexOf(computer), 1);
             setComputersToDelete(copyComputersToDelete);
-            
+            console.log("computer is in computer to delete");
         }
         console.log("computer:");
         console.log(computer);
+        console.log("computerDeleted");
+        console.log(computerDeleted[0]);
     }
     
+
+
     const toggleCheckAll = (event) => {
-        setCheckall(!checkall);
+        if ( event.target.checked === true ) {
+
+            let copy = [...computersToDelete];
+            
+            computers.map( computer => {
+                if ( !copy.includes(computer) ) {
+                    copy.push(computer);
+                }
+            });
+
+            setComputersToDelete(copy);
+        }
+        else {
+            setComputersToDelete([]);
+        }
     }
+
+
 
     return (
         <div>
@@ -85,7 +113,7 @@ export default function ComputerBoard(props) {
                     <th>Discontinued date</th>
                     <th>Company</th>
                     <th>
-                        <input type="checkbox" onChange={toggleCheckAll}/>
+                        <input type="checkbox" onClick={toggleCheckAll}/>
                         <DeleteForeverIcon fontSize="large" onClick={handleDeleteSelection} />
                     </th>
                 </tr>
@@ -100,7 +128,7 @@ export default function ComputerBoard(props) {
                             takeOutComputerToDelete = {takeOutComputerToDelete}
                             handleDelete = {handleDelete}
                             handleEdit = {handleEdit}
-                            checkall = {checkall}
+                            isChecked = {computersToDelete.includes(computer)}
                         />
                     );
                 })}
@@ -109,5 +137,9 @@ export default function ComputerBoard(props) {
         </div>
     );
 
+
+}
+
+ComputerBoard.propTypes = {
 
 }
