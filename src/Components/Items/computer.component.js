@@ -7,7 +7,6 @@ import EditIcon from '@material-ui/icons/Edit';
 
 export default function ComputerComponent(props) {
     const [computer, setComputer] = useState(props.computer);
-    const [isChecked, setIsChecked] = useState(props.isChecked);
     const [editMode, setEditMode] = useState(false);
 
 
@@ -20,36 +19,6 @@ export default function ComputerComponent(props) {
         else {
             props.takeOutComputerToDelete(computer);
         }
-    }
-
-
-
-
-    const displayComputerField = (input, fieldName) => {
-        return(
-            <td>
-                {editMode ?
-                    <input placeholder={input} size="15" onChange={(event) => handleChangeComputerField(event, fieldName)}/>
-                    :
-                    input
-                }
-            </td>
-        );
-    }
-
-
-
-
-    const displayCompanyField = (input, fieldName) => {
-        return(
-            <td>
-                {editMode ?
-                    <input placeholder={input} size="15" onChange={(event) => handleChangeCompanyField(event, fieldName)} />
-                    :
-                    input
-                }
-            </td>
-        );
     }
 
 
@@ -117,7 +86,7 @@ export default function ComputerComponent(props) {
                 }
             </td>
             <td>
-                {isChecked ?
+                {props.isChecked ?
                     <input type="checkbox" name="cb" onClick={handleClick} checked />
                     :
                     <input type="checkbox" name="cb" onClick={handleClick} />

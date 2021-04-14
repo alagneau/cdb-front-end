@@ -33,12 +33,9 @@ export default function ComputerBoard(props) {
 
 
     const handleEdit = (computerEdited) => {
-        console.log("computerBoard --> handleEdit --> computers:");
         let copy = [...computers];
         copy.splice(copy.indexOf(computers.find(comp => comp.id === computerEdited.id)), 1, computerEdited);
         setComputers(copy);
-        console.log("computers");
-        console.log(computers);
     }    
 
 
@@ -53,29 +50,17 @@ export default function ComputerBoard(props) {
 
   
     const handleDelete = (computer) => {
-        console.log("computerBoard --> handleDelete:");
         let copyComputers = [...computers];
-        
         let index = copyComputers.indexOf(computer);
-        console.log("index of computer to delete:");
-        console.log(index);
 
         let computerDeleted = copyComputers.splice(index, 1);
         setComputers(copyComputers);
-        
-        console.log("computers:");
-        console.log(computers);
 
         if ( computersToDelete.includes(computer) ) {
             let copyComputersToDelete = [...computersToDelete];
             copyComputersToDelete.splice(copyComputersToDelete.indexOf(computer), 1);
             setComputersToDelete(copyComputersToDelete);
-            console.log("computer is in computer to delete");
         }
-        console.log("computer:");
-        console.log(computer);
-        console.log("computerDeleted");
-        console.log(computerDeleted[0]);
     }
     
 
