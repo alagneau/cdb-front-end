@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
@@ -8,24 +8,33 @@ function CompanyItem(props) {
     const [edit, setEdit] = useState(props.edit);
     const [company, setCompany] = useState(props.company);
 
-    const updateInputValue = (e) => {
-        let copy = { ...company };
-        copy[e.target.name] = e.target.value;
-        setCompany(copy);
-      }
+    const updateInputValue = (e, id) => {
+        props.onUpdate(e, id);
+    }
+
+    const handleKeyDown = (e, id) => {
+        if (e.key === 'Enter') {
+            updateInputValue(e, id);
+            const copy = {...company};
+            copy[e.target.name] = e.target.value;
+            setCompany(copy)
+            setEdit(false);
+        } else if (e.key === 'Escape') {
+            setEdit(false);
+        }
+    }
 
     return (
         <Card className="card fade-in example-card">
             <CardContent>
                 {edit
-                    ? <input type="text" defaultValue={company.name} name="name" type="text" onChange={(e) => updateInputValue(e)} />
-                    : <p className="mat-card-header">
+                    ? <input type="text" defaultValue={company.name} name="name" autoFocus type="text" onKeyDown={(e) => handleKeyDown(e, company.id)} />
+                    : <p className="mat-card-header" onDoubleClick={() => { setEdit(true) }}>
                         {company.name}
                     </p>}
             </CardContent>
             <CardActions>
-                <button onClick={() => setEdit(!edit)}>Edit</button>
-                <button onClick={() => props.onDelete(props.company)}>Delete</button>
+                <button onClick={() => props.onDelete(company)}>Delete</button>
             </CardActions>
         </Card>
     );
