@@ -63,42 +63,17 @@ export function LoginView(props) {
       event.preventDefault();
     };
 
-
-    // useEffect(() => {
-    //     // const requestOptions = {
-    //     //     method: 'POST',
-    //     //     headers: {
-    //     //         'Authorization': 'Basic Y2xpZW50SWRQYXNzd29yZDpzZWNyZXQ=',
-    //     //         'Access-Control-Allow-Origin': '*',
-    //     //         'Content-Type': 'text/plain'
-    //     //     }
-    //     // };
-    //     // const response = fetch('http://localhost:8080/webapp/oauth/token?username=admin&password=admin&grant_type=password&client_id=clientIdPassword', requestOptions);
-    //     const requestOptions = {
-    //         method: 'POST',
-    //         data: {
-    //             username: "admin",
-    //             password: "admin"
-    //         },
-    //         headers: {
-    //             // 'Authorization': 'Bearer e979ee87-da55-4e7f-af6e-0dce4245d47c',
-    //             // 'Access-Control-Allow-Origin': '*',
-    //             // 'Content-Type': 'application/json'
-    //         }
-    //     };
-    //     const response = fetch('http://localhost:8080/webapp/login', requestOptions);
-    //     const data = response;
-    //     console.log(data);
-    // })
-
     const handleSubmit = () => {
-        axios.post(baseURL + "/login",
+        axios.post(baseURL + "/login/Oauth",
             {
                 username: user.username,
                 password: user.password
             })
             .then(response => {
+                console.log(response)
                 if (response.status === 200) {
+                    localStorage.setItem("access_token", response.data.access_token)
+                    localStorage.setItem("refresh_token", response.data.refresh_token)
                     handleConnected("true")
                 }
             }).catch(error => {
