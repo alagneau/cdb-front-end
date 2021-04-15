@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Route } from 'react-router-dom';
-import { HomeView } from '../Components/Views/Home/home.view';
+import { LoginView } from '../Components/Views/Login/login.view';
 
 export function RouteCDB({ component: Component, ...rest }) {
     const connected = localStorage.getItem("connected")
@@ -13,7 +13,7 @@ export function RouteCDB({ component: Component, ...rest }) {
             connected === "true" ?
                 <Component {...rest}/>
             :
-                <HomeView {...rest}/>
+                <LoginView {...rest}/>
         )}
       />
     )
