@@ -18,7 +18,7 @@ export default function CompanyBoard() {
     const [edit, setEdit] = useState(false);
     const [companies, setCompanies] = useState([]);
     const [error, setError] = useState(null);
-    const token = 'a19af7c4-0665-4ebb-9474-6ade6aaf8496';
+    const token = localStorage.getItem("token");
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
 
@@ -32,7 +32,7 @@ export default function CompanyBoard() {
     };
 
     const getApiList = () => {
-        fetch('http://localhost:8080/webapp/APICompany/list',
+        fetch(`${url}/list`,
             {
                 method: 'GET',
                 headers: {
