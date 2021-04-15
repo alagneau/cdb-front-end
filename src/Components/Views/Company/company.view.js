@@ -7,7 +7,6 @@ function CompanyView() {
             <header>
                 <div className="header">
                     <p>Company</p>
-                    <button>Add Company</button>
                 </div>
             </header>
             <div className="test">
@@ -15,7 +14,6 @@ function CompanyView() {
                     Test
                 </div>
                 <CompanyBoard />
-                
             </div>
         </body>
     );
