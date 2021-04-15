@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import clsx from 'clsx';
-import { baseURL } from '../../Models/auth';
+import { baseURL } from '../../../libs/context.js';
 
 import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
@@ -13,6 +13,7 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import { Button } from '@material-ui/core';
 import axios from 'axios';
+import {Redirect} from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -33,110 +34,82 @@ const useStyles = makeStyles((theme) => ({
 export function LoginView(props) {
     const classes = useStyles()
 
-    const [user_params, setUserParams] = useState({
-      username: '',
-      password: '',
-      showPassword: false
-    });
-  
-    const handleChange = (prop) => (event) => {
-        setUserParams({ ...user_params, [prop]: event.target.value });
+    const [showPassword, setShowPassword] = useState(false)
+    const [user, setUser] = useState({
+        username: localStorage.getItem("username"),
+        password: ""
+    })
+
+    const [connected, setConnected] = useState(localStorage.getItem("connected"))
+
+    const handleChangeName = (event) => {
+        setUser({...user, "username": event.target.value})
+        localStorage.setItem("username", event.target.value)
+    };
+    const handleChangePassword = (event) => {
+        setUser({...user, "password": event.target.value})
+    };
+
+    const handleConnected = (value) => {
+        localStorage.setItem("connected", value)
+        setConnected(value)
     };
   
     const handleClickShowPassword = () => {
-        setUserParams({ ...user_params, showPassword: !user_params.showPassword });
+        setShowPassword(!showPassword);
     };
   
     const handleMouseDownPassword = (event) => {
       event.preventDefault();
     };
 
-    useEffect(() => {
-        // fetch(baseURL + "/login", {
-        //     'auth': {
-        //         user: "admin",
-        //         pass: "admin"
-        //     },
-        // }).then(response => {
-        //     console.log(response)
-        // }).catch(error => console.log(error))
-    })
 
-    // let bodyFormData = new FormData()
-    // bodyFormData.append("username", "admin")
-    // bodyFormData.append("password", "admin")
-    // bodyFormData.append("grant_type", "password")
-    // bodyFormData.append("client_id", "clientIdPassword")
-
-    // const handleSubmit = function() {
-    //     console.log("LOGGING IN");
-    //     // axiosInstance.post('/oauth/token', {
-    //     //     username: user_params.username,
-    //     //     password: user_params.password,
-    //     //     grant_type: "password",
-    //     //     client_id: "clientIdPassword"
-    //     // }).then(response => {
-    //     //     console.log(response);
-    //     // }).catch(err => {
-    //     //     alert(err)
-    //     // })
-    //     axios({
-    //         method: "get",
-    //         url: baseURL + "/APIComputer/count",
-            
-    //             params: {
-    //                 "username": "admin",
-    //                 "password": "admin",
-    //                 "grant_type": "password",
-    //                 "client_id": "clientIdPassword"
-    //             }
-    //         ,auth: {
+    // useEffect(() => {
+    //     // const requestOptions = {
+    //     //     method: 'POST',
+    //     //     headers: {
+    //     //         'Authorization': 'Basic Y2xpZW50SWRQYXNzd29yZDpzZWNyZXQ=',
+    //     //         'Access-Control-Allow-Origin': '*',
+    //     //         'Content-Type': 'text/plain'
+    //     //     }
+    //     // };
+    //     // const response = fetch('http://localhost:8080/webapp/oauth/token?username=admin&password=admin&grant_type=password&client_id=clientIdPassword', requestOptions);
+    //     const requestOptions = {
+    //         method: 'POST',
+    //         data: {
     //             username: "admin",
     //             password: "admin"
+    //         },
+    //         headers: {
+    //             // 'Authorization': 'Bearer e979ee87-da55-4e7f-af6e-0dce4245d47c',
+    //             // 'Access-Control-Allow-Origin': '*',
+    //             // 'Content-Type': 'application/json'
     //         }
-            
-    //             // headers: {
-    //             //     "Access-Control-Allow-Origin": "test",
-    //             //     Authorization: "Basic Y2xpZW50SWRQYXNzd"
-    //             // }
-    //     })
-    //     .then(response => {console.log(response)})
-    //     .catch(err => {console.log(err)})
-    // };
+    //     };
+    //     const response = fetch('http://localhost:8080/webapp/login', requestOptions);
+    //     const data = response;
+    //     console.log(data);
+    // })
 
     const handleSubmit = () => {
-        axios.post(baseURL + "/oauth/token",
+        axios.post(baseURL + "/login",
             {
-                params: {
-                    "username": "admin",
-                    "password": "admin",
-                    "grant_type": "password",
-                    "client_id": "clientIdPassword"
-                },
-                auth: {
-                    user: "clientIdPassword",
-                    pass: "secret"
+                username: user.username,
+                password: user.password
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    handleConnected("true")
                 }
-        // axios.get(baseURL + "/APIComputer/count", {
-        //         headers: {
-        //             'Authorization': "Bearer 2ec03420-51fe-4af4-8f0f-651fb0cc88ee"
-        //         }
-            }).then(function(response) {
-                console.log(response)
-                console.log('Authenticated');
-            }).catch(function(error) {
+            }).catch(error => {
                 console.log(error)
-                console.log('Error on Authentication');
-            });
+            })
     }
 
     return(
         <div>
             <h2>Login page</h2>
             <div>
-                <div>
-                    <h3>Example</h3>
-                </div>
                 <form onSubmit={() => handleSubmit()} action="">
                 <div className={classes.root}>
                     <div>
@@ -145,7 +118,8 @@ export function LoginView(props) {
                             id="outlined-start-adornment"
                             className={clsx(classes.margin, classes.textField)}
                             variant="outlined"
-                            onChange={handleChange('username')}
+                            onChange={e => handleChangeName(e)}
+                            value={user.username}
                         />
                     </div>
                     <div>
@@ -153,9 +127,9 @@ export function LoginView(props) {
                         <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                         <OutlinedInput
                             id="outlined-adornment-password"
-                            type={user_params.showPassword ? 'text' : 'password'}
-                            value={user_params.password}
-                            onChange={handleChange('password')}
+                            type={showPassword ? 'text' : 'password'}
+                            onChange={e => handleChangePassword(e)}
+                            value={user.password}
                             endAdornment={
                             <InputAdornment position="end">
                                 <IconButton
@@ -164,7 +138,7 @@ export function LoginView(props) {
                                 onMouseDown={handleMouseDownPassword}
                                 edge="end"
                                 >
-                                {user_params.showPassword ? <Visibility /> : <VisibilityOff />}
+                                {showPassword ? <Visibility /> : <VisibilityOff />}
                                 </IconButton>
                             </InputAdornment>
                             }
@@ -178,6 +152,7 @@ export function LoginView(props) {
                 </div>
                 </form>
             </div>
+            {(connected==="true") && <Redirect to={props.path} {...props}/>}
         </div>
     )
 }
