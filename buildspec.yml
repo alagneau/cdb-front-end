@@ -1,8 +1,13 @@
 version: 0.2
 phases:
-    build:
-        commands:
-            - npm i --save
+  pre_build:
+    commands:
+      - echo Installing source NPM dependencies...
+      - npm install
+  build:
+    commands:
+      - echo Build started 
+      - npm run build
 artifacts:
     files:
         - '**/*'
