@@ -1,10 +1,21 @@
 import logo from './logo.svg';
 import './App.css';
-import CompanyView from './Components/Views/Company/company.view';
+import { BrowserRouter, Switch } from 'react-router-dom'
+import { HomeView } from './Components/Views/Home/home.view';
+import { RouteCDB } from './libs/route.component';
 
 function App() {
+
   return (
-      <CompanyView />
+    <BrowserRouter>
+      <div className="App">
+        <Switch>
+          <RouteCDB exact path="/" component={HomeView}/>
+          <RouteCDB path="/home" component={HomeView}/>
+          <RouteCDB path="/" component={HomeView}/>
+        </Switch>
+      </div>
+    </BrowserRouter>
   );
 }
 
