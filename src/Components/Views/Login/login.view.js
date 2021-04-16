@@ -63,38 +63,6 @@ export function LoginView(props) {
       event.preventDefault();
     };
 
-    const handleToken = (value) => {
-        localStorage.setItem("token", value);
-    }
-
-
-    // useEffect(() => {
-    //     // const requestOptions = {
-    //     //     method: 'POST',
-    //     //     headers: {
-    //     //         'Authorization': 'Basic Y2xpZW50SWRQYXNzd29yZDpzZWNyZXQ=',
-    //     //         'Access-Control-Allow-Origin': '*',
-    //     //         'Content-Type': 'text/plain'
-    //     //     }
-    //     // };
-    //     // const response = fetch('http://localhost:8080/webapp/oauth/token?username=admin&password=admin&grant_type=password&client_id=clientIdPassword', requestOptions);
-    //     const requestOptions = {
-    //         method: 'POST',
-    //         data: {
-    //             username: "admin",
-    //             password: "admin"
-    //         },
-    //         headers: {
-    //             // 'Authorization': 'Bearer e979ee87-da55-4e7f-af6e-0dce4245d47c',
-    //             // 'Access-Control-Allow-Origin': '*',
-    //             // 'Content-Type': 'application/json'
-    //         }
-    //     };
-    //     const response = fetch('http://localhost:8080/webapp/login', requestOptions);
-    //     const data = response;
-    //     console.log(data);
-    // })
-
     const handleSubmit = () => {
         axios.post(baseURL + "/login/Oauth",
             {
@@ -102,10 +70,11 @@ export function LoginView(props) {
                 password: user.password
             })
             .then(response => {
+                console.log(response)
                 if (response.status === 200) {
-                    console.log(response.data.access_token)
-                    handleToken(response.data.access_token)
-                    handleConnected("true");
+                    localStorage.setItem("access_token", response.data.access_token)
+                    localStorage.setItem("refresh_token", response.data.refresh_token)
+                    handleConnected("true")
                 }
             }).catch(error => {
                 console.log(error)
