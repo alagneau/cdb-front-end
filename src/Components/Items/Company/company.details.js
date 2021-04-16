@@ -10,7 +10,7 @@ import TablePagination from '@material-ui/core/TablePagination';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 
-function CompanyItem(props) {
+function CompanyDetails(props) {
     const [edit, setEdit] = useState(props.edit);
     const [company, setCompany] = useState(props.company);
     const token = localStorage.getItem('token');
@@ -18,11 +18,6 @@ function CompanyItem(props) {
     const url = 'http://localhost:8080/webapp/APIComputer';
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [expanded, setExpanded] = useState(false);
-
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
 
     const getComputers = () => {
         fetch(`${url}/ByCompany/${company.id}/page/${page}/${rowsPerPage}`,
@@ -74,42 +69,16 @@ function CompanyItem(props) {
 
 
     return (
-        <Card className="card fade-in example-card">
-            <CardHeader
-                avatar={
-                    <Avatar src="https://previews.123rf.com/images/iamnee/iamnee1301/iamnee130100165/17417606-fourniture-de-bureau-une-illustration-de-dessin-anim%C3%A9-d-ordinateur-personnel-de-bureau-dans-circle-.jpg" />
-                }
-                title={edit
-                    ? <input type="text" defaultValue={company.name} name="name" autoFocus type="text" onKeyDown={(e) => handleKeyDown(e, company.id)} />
-                    : <p className="mat-card-header" onDoubleClick={() => { setEdit(true) }}>
-                        {company.name}
-                    </p>}
-            />
-            <CardContent>
-                <ul>
-                    {computers.map((elem) => {
-                        return <li>{elem.name}</li>
-                    })
-                    }
-                </ul>
-                <TablePagination
-                    component="div"
-                    count={-1}
-                    page={page}
-                    onChangePage={handleChangePage}
-                    rowsPerPage={rowsPerPage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
-                />
-            </CardContent>
-            <CardActions>
-                <Button color="secondary" variant="outlined"
-                    size="small" onClick={() => props.onDelete(company)}>Supprimer</Button>
-                <Button color="secondary" variant="outlined">
-                    Détails
-                </Button>
-            </CardActions>
-        </Card>
+        <div class="modal fade" id="myModal2" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <Card className="card fade-in example-card">
+                        <div>Hello</div>
+                    </Card>
+                </div>
+            </div>
+        </div>
     );
 }
 
-export default CompanyItem;
+export default CompanyDetails;

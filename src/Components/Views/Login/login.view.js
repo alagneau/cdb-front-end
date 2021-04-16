@@ -63,6 +63,10 @@ export function LoginView(props) {
       event.preventDefault();
     };
 
+    const handleToken = (value) => {
+        localStorage.setItem("token", value);
+    }
+
 
     // useEffect(() => {
     //     // const requestOptions = {
@@ -92,14 +96,16 @@ export function LoginView(props) {
     // })
 
     const handleSubmit = () => {
-        axios.post(baseURL + "/login",
+        axios.post(baseURL + "/login/Oauth",
             {
                 username: user.username,
                 password: user.password
             })
             .then(response => {
                 if (response.status === 200) {
-                    handleConnected("true")
+                    console.log(response.data.access_token)
+                    handleToken(response.data.access_token)
+                    handleConnected("true");
                 }
             }).catch(error => {
                 console.log(error)
