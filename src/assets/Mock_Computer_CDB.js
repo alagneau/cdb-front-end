@@ -227,5 +227,15 @@ export const MOCK_COMPUTERS = [
 			"id":1,
 			"name":"Apple Inc."
 		}
+	},
+	{
+		"id":26,
+		"name":"Indiana",
+		"introduced":"2020-03-16",
+		"discontinued":null,
+		"company":{
+			"id":4,
+			"name":"Netronics"
+		}
 	}
 ]

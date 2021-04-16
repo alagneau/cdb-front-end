@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { MOCK_COMPUTERS } from "../../assets/Mock_Computer_CDB";
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import ComputerComponent from "../Items/computer.component";
+import Computer from "../Items/Computer";
 
 import PropTypes from 'prop-types';
 
 
-export default function ComputerBoard(props) {
+export default function ComputerBoard() {
    
     const [computers, setComputers] = useState(MOCK_COMPUTERS);
     const [computersToDelete, setComputersToDelete] = useState([]);
+    const [creationActivated, setCreationActivated] = useState(false);
 
 
     const pushComputerToDelete = (computer) => {
@@ -44,6 +45,7 @@ export default function ComputerBoard(props) {
         let computersRemaining = computers.filter( computer => {
             return !computersToDelete.includes(computer);
         });
+        setComputersToDelete([]);
         setComputers(computersRemaining);
     }
 
@@ -84,13 +86,30 @@ export default function ComputerBoard(props) {
     }
 
 
+    // Rudimentary version.
+    // Doesn't work yet
+    const createComputer = (event) => {
+        const computer = {
+            id: 500,
+            name: event.target[0].value,
+            introduced: event.target[1].value,
+            discontinued: event.target[2].value,
+            company: {
+                id: null,
+                name: event.target[3].value
+            }
+        };
+        console.log(computer);
+        let copy = [...computers];
+        copy.push(computer);
+        setComputers(copy);
+        event.preventDefault();
+    }
+
 
     return (
         <div>
-            <div align="right">
-                <button>New Computer</button>
-            </div>
-            <table>
+        <table>
             <thead>
                 <tr>
                     <th>Computer name</th>
@@ -106,7 +125,7 @@ export default function ComputerBoard(props) {
             <tbody>
                 {computers.map( computer => {
                     return (
-                        <ComputerComponent 
+                        <Computer 
                             key = {computer.id}
                             computer = {computer}
                             pushComputerToDelete = {pushComputerToDelete}
@@ -119,6 +138,29 @@ export default function ComputerBoard(props) {
                 })}
             </tbody>
         </table>
+
+        {creationActivated && 
+            <form onSubmit={createComputer}>
+                <table>
+                    <tbody>
+                        <tr>
+                        <td><input type="text" placeholder="Computer Name" size="15" /></td>
+                        <td><input type="date" placeholder="Introduced Date" size="15" /></td>
+                        <td><input type="date" placeholder="Discontinued Date" size="15" /></td>
+                        <td><input type="text" placeholder="Company Name" size="15" /></td>
+                        <td>
+                            <button type="submit">ADD</button>
+                            <button onClick={() => setCreationActivated(false)}>CANCEL</button>
+                        </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        }
+
+        {!creationActivated &&
+            <button onClick={() => setCreationActivated(true)}>New Computer</button>
+        }
         </div>
     );
 
@@ -126,5 +168,5 @@ export default function ComputerBoard(props) {
 }
 
 ComputerBoard.propTypes = {
-
+    // No props
 }

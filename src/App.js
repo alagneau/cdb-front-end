@@ -1,11 +1,12 @@
 import logo from './logo.svg';
 import './App.css';
-import ComputerBoard from './Components/Boards/computerBoard.component';
+import ComputerBoard from './Components/Boards/ComputerBoard';
+import EnhancedTable from './Components/Boards/EnhancedTable';
 
 function App() {
   return (
     <div>
-      <ComputerBoard />
+      <EnhancedTable />
     </div>
   );
 }

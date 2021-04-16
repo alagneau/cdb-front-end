@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Computer } from "../Models/computer.model"; // Le model n'est pas utilisé et je ne sais pas comment l'utiliser
 import DeleteOutlineOutlinedIcon from '@material-ui/icons/DeleteOutlineOutlined';
 import EditIcon from '@material-ui/icons/Edit';
 
 
-export default function ComputerComponent(props) {
+export default function Computer(props) {
+    
     const [computer, setComputer] = useState(props.computer);
     const [editMode, setEditMode] = useState(false);
 
@@ -48,6 +48,7 @@ export default function ComputerComponent(props) {
             <td>
                 {editMode ?
                     <input placeholder={computer.name} 
+                           type="text"
                            size="15" 
                            onChange={(event) => handleChangeComputerField(event, "name")}
                     />
@@ -58,6 +59,7 @@ export default function ComputerComponent(props) {
             <td>
                 {editMode ?
                     <input placeholder={computer.introduced} 
+                           type="date"
                            size="15" 
                            onChange={(event) => handleChangeComputerField(event, "introduced")}
                     />
@@ -67,7 +69,8 @@ export default function ComputerComponent(props) {
             </td>
             <td>
                 {editMode ?
-                    <input placeholder={computer.discontinued} 
+                    <input placeholder={computer.discontinued}
+                           type="date" 
                            size="15" 
                            onChange={(event) => handleChangeComputerField(event, "discontinued")}
                     />
@@ -77,7 +80,8 @@ export default function ComputerComponent(props) {
             </td>
             <td>
                 {editMode ?
-                    <input placeholder={computer.company !== null && computer.company.name} 
+                    <input placeholder={computer.company !== null && computer.company.name}
+                           type="text" 
                            size="15" 
                            onChange={(event) => handleChangeCompanyField(event, "name")} 
                     />
@@ -98,7 +102,7 @@ export default function ComputerComponent(props) {
     );
 }
 
-ComputerComponent.propTypes = {
+Computer.propTypes = {
     computer: PropTypes.object.isRequired,
     pushComputerToDelete: PropTypes.func.isRequired,
     takeOutComputerToDelete: PropTypes.func.isRequired,
