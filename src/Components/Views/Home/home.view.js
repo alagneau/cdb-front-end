@@ -6,7 +6,7 @@ export function HomeView(props) {
         <div>
             <h2>Home page</h2>
             <div>
-                <p>Vous êtes connectés ({localStorage.getItem("username")} {localStorage.getItem("password")}) ! Super !</p>
+                <p>Vous êtes connectés ({localStorage.getItem("username")} {localStorage.getItem("access_token")}) ! Super !</p>
             </div>
         </div>
     )

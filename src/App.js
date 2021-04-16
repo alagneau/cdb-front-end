@@ -2,6 +2,7 @@ import './App.css';
 import { BrowserRouter, Switch } from 'react-router-dom'
 import { HomeView } from './Components/Views/Home/home.view';
 import { RouteCDB } from './libs/route.component';
+import { Logout } from './Components/Views/Login/Logout';
 
 function App() {
 
@@ -10,7 +11,7 @@ function App() {
       <div className="App">
         <Switch>
           <RouteCDB exact path="/" component={HomeView}/>
-          <RouteCDB path="/home" component={HomeView}/>
+          <RouteCDB path="/logout" component={Logout}/>
           <RouteCDB path="/" component={HomeView}/>
         </Switch>
       </div>
