@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import { baseURL } from '../../../libs/context.js';
 
@@ -70,8 +70,8 @@ export function LoginView(props) {
                 password: user.password
             })
             .then(response => {
-                console.log(response)
                 if (response.status === 200) {
+                    setUser({...user, "password": ""})
                     localStorage.setItem("access_token", response.data.access_token)
                     localStorage.setItem("refresh_token", response.data.refresh_token)
                     handleConnected("true")
