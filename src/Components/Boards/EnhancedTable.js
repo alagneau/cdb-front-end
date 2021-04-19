@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { lighten, withStyles, makeStyles } from '@material-ui/core/styles';
@@ -21,6 +21,10 @@ import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { MOCK_COMPUTERS as computers } from "../../assets/Mock_Computer_CDB";
+import { TextField } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
+import Fab from '@material-ui/core/Fab';
+import SearchBar from "material-ui-search-bar";
 
 
 
@@ -58,9 +62,6 @@ function descendingComparator(a, b, orderBy) {
 
 
 function getComparator(order, orderBy) {
-
-  console.log('order'); console.log(order); 
-  console.log('orderBy'); console.log(orderBy);
 
   return order === 'desc'
   ? (a, b) => descendingComparator(a, b, orderBy)
@@ -196,8 +197,12 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 
 const EnhancedTableToolbar = (props) => {
+
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const { numSelected, handleDelete } = props;
+
+
+
 
   return (
     <Toolbar
@@ -218,16 +223,13 @@ const EnhancedTableToolbar = (props) => {
       {numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton aria-label="delete">
-            <DeleteIcon />
+            <DeleteIcon onClick={handleDelete} />
           </IconButton>
         </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton aria-label="filter list">
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+      ) : ( 
+        <SearchBar />
+      )
+      }
     </Toolbar>
   );
 };
@@ -272,6 +274,10 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EnhancedTable() {
 
+  const url = 'http://localhost:8080/webapp/APIComputer';
+  
+  //const token = localStorage.getItem('access_token');
+  const token = '4f22ce98-36f7-49ca-9e78-3e346d7f07af';
 
   const classes = useStyles();
   const [order, setOrder] = useState('asc');
@@ -280,8 +286,30 @@ export default function EnhancedTable() {
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [rows, setRows] = useState(computers.map( computer => createData(computer) ));
+  const [rows, setRows] = useState([]);
 
+  useEffect(() => {
+    getApiList();
+  }, [])
+
+  const getApiList = () => {
+    fetch(`${url}/page/0/20`,
+        {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        })
+        .then(data => data.json())
+        .then(
+            (result) => {
+                setRows(result);
+            }//,
+            // (error) => {
+            //     setError(error);
+            // }
+        );
+  }
 
 
   const handleRequestSort = (event, property) => {
@@ -354,17 +382,24 @@ export default function EnhancedTable() {
 
 
 
+  const handleDelete = () => {
+    setRows(rows.filter( computer => !selected.includes(computer.name) ));
+    setSelected([]);
+  }
+
+
   return (
     <div className={classes.root}>
       <button onClick={() => { setOrderBy(); setOrder('asc'); }}>RESET ORDER</button> 
       <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} 
+                              handleDelete={handleDelete} />
         <TableContainer>
           <Table
             className={classes.table}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
-            aria-label="enhanced table"
+            aria-label="enhanced table"handleClickhandleClick
           >
             <EnhancedTableHead
               classes={classes}
