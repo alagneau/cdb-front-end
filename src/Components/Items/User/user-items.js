@@ -1,13 +1,33 @@
 import { React, useState } from 'react';
 import '../../../App.css';
 
-import EditRoundedIcon from '@material-ui/icons/Edit';
-import PersonAddDisabledRoundedIcon from '@material-ui/icons/PersonAddDisabledRounded';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
+import Input from '@material-ui/core/Input';
+
+import './user-items.scss';
 
 function UserItems(props) {
 
     const [edit, setEdit] = useState(props.edit);
     const [user, setUser] = useState(props.user);
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            console.log(user)
+            props.onUpdate(user)
+            const temp = { ...user };
+            temp[e.target.name] = e.target.value;
+            setUser(temp)
+            setEdit(false);
+        } else if (e.key === 'Escape') {
+            setEdit(false);
+        }
+    }
 
     const updateUserName = (e) => {
         let temp = { ...user };
@@ -26,21 +46,51 @@ function UserItems(props) {
         temp.authority[e.target.name] = e.target.value;
         setUser(temp);
     }
-    return (
-        <li>
-            {edit
-                ? <div className="name"><input type="text" defaultValue={user.username} name="name" type="text" onChange={(e) => updateUserName(e)} /></div>
-                : <div className="name">{user.username}</div>}
-            {edit
-                ? <span className="other"><input type="text" defaultValue={user.enabled} name="enabled" type="text" onChange={(e) => updateEnabled(e)} /></span>
-                : <span className="other">{user.enabled}</span>}
-            {edit
-                ? <span className="other"><input type="text" defaultValue={user.authority.authority} name="authority" type="text" onChange={(e) => updateAuthority(e)} /></span>
-                : <span className="other">{user.authority.authority}</span>}
 
-            <span className="other"><EditRoundedIcon style={{ color: "green" }} onClick={() => setEdit(!edit)} />
-                <PersonAddDisabledRoundedIcon style={{ color: "red" }} onClick={() => props.onDelete(props.user)} /></span>
-        </li>
+    return (
+        <Card className="card fade-in example-card">
+            <CardContent>
+                {edit
+                    ? <form noValidate autoComplete="off" onKeyDown={(e) => handleKeyDown(e)}>
+                         <TextField id="standard-basic" name="username" label="Username" defaultValue={user.username} onChange={(e) => updateUserName(e)} />
+                         <TextField id="standard-basic" name="enabled" label="Enabled" defaultValue={user.enabled} onChange={(e) => updateEnabled(e)}/>
+                         <TextField id="standard-basic" name="authority" label="Authority" defaultValue={user.authority.authority} onChange={(e) => updateAuthority(e)}/>
+                      </form>
+                    : <p className="mat-card-header">
+                        <Typography>
+                            Username
+                        </Typography>
+                        <Typography>
+                            {user.username}
+                        </Typography>
+                        <Typography>
+                            Enabled
+                        </Typography>
+                        <Typography>
+                            {user.enabled}
+                        </Typography>
+                        <Typography>
+                            Authority
+                        </Typography>
+                        <Typography>
+                            {user.authority.authority}
+                        </Typography>
+                    </p>}
+            </CardContent>
+            {!edit
+                ? <CardActions>
+                    <Button size="small" color="primary" onClick={() => props.onResetPassword(user)} >
+                        Reset password
+                    </Button>
+                    <Button size="small" color="primary">
+                        Edit
+                    </Button>
+                    <Button color="secondary" variant="outlined"
+                        size="small" onClick={() => props.onDelete(user)}>Supprimer</Button>
+                </CardActions>
+                : <p>Entrer pour valider / Echap pour annuler</p>}
+
+        </Card>
     );
 }
 

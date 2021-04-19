@@ -6,7 +6,7 @@ function LateralNav() {
         <div className="nav">
             <div className="nav-title">Title</div>
             <div className="nav-menu">
-                <Link to="/">Home</Link>
+                <Link to="/user">User</Link>
                 <Link to="/test">Test</Link>
             </div>
         </div>
