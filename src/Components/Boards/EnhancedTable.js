@@ -19,11 +19,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
-import { MOCK_COMPUTERS as computers } from "../../assets/Mock_Computer_CDB";
-import { TextField } from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
-import Fab from '@material-ui/core/Fab';
 import SearchBar from "material-ui-search-bar";
 
 
@@ -276,24 +271,29 @@ export default function EnhancedTable() {
 
   const url = 'http://localhost:8080/webapp/APIComputer';
   
-  //const token = localStorage.getItem('access_token');
-  const token = '4f22ce98-36f7-49ca-9e78-3e346d7f07af';
+  const token = localStorage.getItem('access_token');
 
   const classes = useStyles();
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState();
   const [selected, setSelected] = useState([]);
-  const [page, setPage] = useState(0);
+  const [pageNumber, setPageNumber] = useState(0);
   const [dense, setDense] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
+  const [totalRows, setTotalRows] = useState();
+
+
+  useEffect( () => {
+    getComputerCount();
+  }, [])
 
   useEffect(() => {
     getApiList();
-  }, [])
+  }, [pageNumber, rowsPerPage])
 
   const getApiList = () => {
-    fetch(`${url}/page/0/20`,
+    fetch(`${url}/page/${pageNumber}/${rowsPerPage}`,
         {
             method: 'GET',
             headers: {
@@ -303,12 +303,26 @@ export default function EnhancedTable() {
         .then(data => data.json())
         .then(
             (result) => {
-                setRows(result);
+              let newRows = [];
+              result.map( computer => newRows.push(createData(computer)) );
+              setRows(newRows);
             }//,
             // (error) => {
             //     setError(error);
             // }
         );
+  }
+
+  const getComputerCount = () => {
+    fetch(`${url}/count`,
+    {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    })
+    .then( data => data.json() )
+    .then( result => setTotalRows( result ) );
   }
 
 
@@ -353,8 +367,8 @@ export default function EnhancedTable() {
 
 
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleChangePage = (event, newPageNumber) => {
+    setPageNumber(newPageNumber);
   };
 
 
@@ -362,7 +376,7 @@ export default function EnhancedTable() {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setPageNumber(0);
   };
 
 
@@ -378,7 +392,7 @@ export default function EnhancedTable() {
 
 
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  //const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - pageNumber * rowsPerPage);
 
 
 
@@ -388,8 +402,9 @@ export default function EnhancedTable() {
   }
 
 
+
   return (
-    <div className={classes.root}>
+    <div align="left" className={classes.root}>
       <button onClick={() => { setOrderBy(); setOrder('asc'); }}>RESET ORDER</button> 
       <Paper className={classes.paper}>
         <EnhancedTableToolbar numSelected={selected.length} 
@@ -412,7 +427,6 @@ export default function EnhancedTable() {
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
@@ -442,20 +456,20 @@ export default function EnhancedTable() {
                     </TableRow>
                   );
                 })}
-              {emptyRows > 0 && (
+              {/* {emptyRows > 0 && (
                 <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
-              )}
+              )} */}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 26]}
+          rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={totalRows}
           rowsPerPage={rowsPerPage}
-          page={page}
+          page={pageNumber}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
