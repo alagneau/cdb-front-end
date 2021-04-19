@@ -11,6 +11,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import CloseIcon from '@material-ui/icons/Close';
+import TablePagination from '@material-ui/core/TablePagination';
 
 export default function CompanyBoard() {
 
@@ -18,9 +19,74 @@ export default function CompanyBoard() {
     const [edit, setEdit] = useState(false);
     const [companies, setCompanies] = useState([]);
     const [error, setError] = useState(null);
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('access_token');
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [ count, setCount ] = useState(0);
+
+    const countCompanies = async () => {
+        await fetch(`${url}/count`,
+            {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            })
+            .then(data => data.json())
+            .then(
+                (result) => {
+                    setCount(result);
+                },
+                (error) => {
+                    setError(error);
+                }
+            );
+    }
+
+    const handleChangePage = async (event, newPage) => {
+        setPage(newPage);
+        await fetch(`${url}/page/${newPage}/${rowsPerPage}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            })
+            .then(data => data.json())
+            .then(
+                (result) => {
+                    setCompanies(result);
+                },
+                (error) => {
+                    setError(error);
+                }
+            );
+    };
+
+    const handleChangeRowsPerPage = async (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+        const limit = parseInt(event.target.value, 10);
+        const index = 0;
+        await fetch(`${url}/page/${index}/${limit}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            })
+            .then(data => data.json())
+            .then(
+                (result) => {
+                    setCompanies(result);
+                },
+                (error) => {
+                    setError(error);
+                }
+            );
+    };
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -31,8 +97,8 @@ export default function CompanyBoard() {
         setName('');
     };
 
-    const getApiList = () => {
-        fetch(`${url}/list`,
+    const getApiList = async () => {
+        await fetch(`${url}/page/${page}/${rowsPerPage}`,
             {
                 method: 'GET',
                 headers: {
@@ -58,6 +124,7 @@ export default function CompanyBoard() {
             }
         });
         getApiList();
+        countCompanies();
     }
 
     const updateCompany = async (event, id) => {
@@ -69,7 +136,7 @@ export default function CompanyBoard() {
             },
             body: JSON.stringify({
                 id: id,
-                logo: 'sdf',
+                logo: 'https://previews.123rf.com/images/iamnee/iamnee1301/iamnee130100165/17417606-fourniture-de-bureau-une-illustration-de-dessin-anim%C3%A9-d-ordinateur-personnel-de-bureau-dans-circle-.jpg',
                 name: `${event.target.value}`
             })
         });
@@ -84,15 +151,17 @@ export default function CompanyBoard() {
                 'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
-                logo: '',
+                logo: 'https://previews.123rf.com/images/iamnee/iamnee1301/iamnee130100165/17417606-fourniture-de-bureau-une-illustration-de-dessin-anim%C3%A9-d-ordinateur-personnel-de-bureau-dans-circle-.jpg',
                 name: `${company.target.value}`
             })
         });
         getApiList();
+        countCompanies();
     }
 
     useEffect(() => {
         getApiList();
+        countCompanies();
     }, [])
 
     const handleChange = (e) => {
@@ -130,17 +199,25 @@ export default function CompanyBoard() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="secondary" variant="outlined" 
-                            size="small" endIcon={<CloseIcon />}>
+                    <Button onClick={handleClose} color="secondary" variant="outlined"
+                        size="small" endIcon={<CloseIcon />}>
                         Annuler
                     </Button>
-                    <Button size="small" variant="outlined" disabled={!name} 
-                            onClick={() => { createCompany(name); handleClose(); setName('') }} 
-                            color="primary" endIcon={<SaveAltIcon />}>
+                    <Button size="small" variant="outlined" disabled={!name}
+                        onClick={() => { createCompany(name); handleClose(); setName('') }}
+                        color="primary" endIcon={<SaveAltIcon />}>
                         Créer
                     </Button>
                 </DialogActions>
             </Dialog>
+            <TablePagination
+                component="div"
+                count={count}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
         </div>
     );
 }

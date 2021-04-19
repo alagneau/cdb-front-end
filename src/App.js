@@ -11,10 +11,10 @@ function App() {
     <BrowserRouter>
       <div className="App">
         <Switch>
-          <RouteCDB exact path="/" component={HomeView}/>
-          <RouteCDB path="/logout" component={Logout}/>
-	  <RouteCDB path="/company" component={CompanyView}/>
-          <RouteCDB path="/" component={HomeView}/>
+          <RouteCDB exact path="/" component={HomeView} />
+          <RouteCDB path="/logout" component={Logout} />
+          <RouteCDB path="/company" component={CompanyView} />
+          <RouteCDB path="/" component={HomeView} />
         </Switch>
       </div>
     </BrowserRouter>
