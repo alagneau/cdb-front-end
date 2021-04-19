@@ -9,6 +9,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ConfirmationDialogRowAuthority from '../../Select/ConfirmationDialogRowAuthority/confirmationDialogRowAuthority'
 import ConfirmationDialogRowEnabled from '../../Select/ConfirmationDialogRowEnabled/confirmationDialogRowEnabled'
 
+import Search from '../../Input/Search/search'
+
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -76,7 +78,22 @@ function UserBoards() {
 
     const handleClose = () => {
         setOpen(false);
+        resetUserToDB()
     };
+
+    const resetUserToDB = () => {
+        setUserToDB(
+            {
+                username: "",
+                enabled: Number,
+                password: "excilys",
+                authority: {
+                    id: Number,
+                    authority: ""
+                }
+            }
+        )
+    }
 
     const getApiList = () => {
         fetch(`${url}/list`,
@@ -181,37 +198,25 @@ function UserBoards() {
             body: JSON.stringify(userToDB)
         });
         getApiList();
-        console.log("Create...")
-        console.log(userToDB)
+        resetUserToDB()
     }
 
-    const formHandler = e => {
+    const usernameFormHandler = e => {
             setUserToDB({ ...userToDB, [e.target.name]: e.target.value })
-            console.log(userToDB)
     }
 
     const enabledFormHandler = newEnabled => {
         setUserToDB({ ...userToDB, enabled : newEnabled })
         setOpenListEnabled(false);
-        console.log(userToDB)
     }
 
     const authorityFormHandler = e => {
-        console.log("valeur de l'évenement")
-        console.log(e.target.value)
         let temp = {...authorityToDB}
-        console.log("valeur initiale")
-        console.log(temp)
         temp.id=parseInt(e.target.value)
-        console.log("valeur apres changement id")
-        console.log(temp)
         temp.authority=authorities[temp.id-1].authority
-        console.log("valeur apres changement authority")
-        console.log(temp)
         setAuthorityToDB(temp)
         setUserToDB({ ...userToDB, authority: authorityToDB })
         setOpenListAuthority(false);
-        console.log(userToDB)
     }
 
     useEffect(() => {
@@ -233,8 +238,9 @@ function UserBoards() {
 
     return (
         <div>
+            <Search searchValue={searchValue} useSearch={onSearch}/>
             <div className="show-items">
-                {users.map((elem) =>
+                {filterList().map((elem) =>
                     <UserItems onUpdate={updateUser}
                         edit={edit} user={elem} onUpdate={updateUser} onDelete={deleteUser} onResetPassword={resetPassword} key={elem.id} />)}
                 <Button size="small" variant="outlined" color="primary" onClick={handleClickOpen}>
@@ -242,7 +248,7 @@ function UserBoards() {
             </Button>
 
                 <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Formulaire de création utilisateur</DialogTitle>
+                    <DialogTitle>Formulaire de création utilisateur</DialogTitle>
                     <DialogContent>
                         <TextField
                             autoFocus
@@ -251,7 +257,7 @@ function UserBoards() {
                             label="username"
                             name="username"
                             type="text"
-                            onChange={formHandler}
+                            onChange={usernameFormHandler}
                             fullWidth
                         />
                         <List key="enabledList">

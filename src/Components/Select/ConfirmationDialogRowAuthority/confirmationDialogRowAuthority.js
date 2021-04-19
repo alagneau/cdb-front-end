@@ -31,7 +31,6 @@ function ConfirmationDialogRowAuthority(props) {
     };
 
     const handleOk = () => {
-        console.log(authorities)
         onOk(value);
     };
 
