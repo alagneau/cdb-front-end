@@ -17,6 +17,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import axios from 'axios';
 
 function UserBoards() {
 
@@ -90,18 +91,17 @@ function UserBoards() {
     }
 
     const getApiList = () => {
-        fetch(`${url}/list`,
+        axios(
             {
+                url: `${url}/list`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    console.log(result)
-                    setUsers(result);
+                    setUsers(result.data);
                 },
                 (error) => {
                     setError(error);
@@ -111,17 +111,17 @@ function UserBoards() {
     }
 
     const getApiListAuthorities = () => {
-        fetch(`${url_authorities}/list`,
+        axios(
             {
+                url: `${url_authorities}/list`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    setAuthorities(result);
+                    setAuthorities(result.data);
                 },
                 (error) => {
                     setError(error);
@@ -131,24 +131,27 @@ function UserBoards() {
 
 
     const deleteUser = async (user) => {
-        await fetch(`${url}/delete?id=` + user.id, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            }
-        });
+        await axios(
+            {
+                url: `${url}/delete?id=` + user.id,
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
+                }
+            });
         getApiList();
     }
 
-    const resetPassword = async (user) => {
-        console.log(
-            await fetch(`${url}/resetpassword`, {
+    const resetPassword = (user) => {
+        axios(
+            {
+                url: `${url}/resetpassword`,
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
                 },
-                body: JSON.stringify({
+                data: JSON.stringify({
                     id: user.id,
                     username: user.username,
                     enabled: user.enabled,
@@ -157,47 +160,51 @@ function UserBoards() {
                         authority: user.authority.authority
                     }
                 })
-            }));
+            });
         getApiList();
     }
 
     const updateUser = async (user) => {
-        await fetch(`${url}/update`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                authority: {
-                    authority: `${user.authority.authority}`,
-                    id: `${user.authority.id}`
+        await axios(
+            {
+                url: `${url}/update`,
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
                 },
-                enabled: `${user.enabled}`,
-                id: `${user.id}`,
-                username: `${user.username}`
+                data: JSON.stringify({
+                    authority: {
+                        authority: `${user.authority.authority}`,
+                        id: `${user.authority.id}`
+                    },
+                    enabled: `${user.enabled}`,
+                    id: `${user.id}`,
+                    username: `${user.username}`
+                })
             })
-        })
         getApiList();
     }
 
     const createUser = async () => {
-        await fetch(`${url}/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                username: `${userToDB.username}`,
-                enabled: `${userToDB.enabled}`,
-                password: "excilys",
-                authority: {
-                    id: `${userToDB.authority.id}`,
-                    authority: `${userToDB.authority.authority}`
-                }
-            })
-        });
+        await axios(
+            {
+                url: `${url}/add`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
+                },
+                data: JSON.stringify({
+                    username: `${userToDB.username}`,
+                    enabled: `${userToDB.enabled}`,
+                    password: "excilys",
+                    authority: {
+                        id: `${userToDB.authority.id}`,
+                        authority: `${userToDB.authority.authority}`
+                    }
+                })
+            });
         getApiList();
         handleClose();
     }
@@ -222,14 +229,6 @@ function UserBoards() {
         getApiList();
         getApiListAuthorities();
     }, [])
-
-
-    function filterList() {
-        if (searchValue == "") {
-            return users;
-        }
-        return users.filter((elem) => elem.username.includes(searchValue));
-    }
 
     function onSearch(value) {
         setSearchValue(value)

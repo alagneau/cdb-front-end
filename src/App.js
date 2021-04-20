@@ -6,6 +6,7 @@ import { Logout } from './Components/Views/Login/Logout';
 import { baseURL } from './libs/context';
 import axios from 'axios';
 import { useEffect } from 'react';
+import UserView from './Components/Views/User/user-view';
 
 function App() {
 	useEffect(() => {
