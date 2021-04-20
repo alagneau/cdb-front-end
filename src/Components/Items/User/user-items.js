@@ -25,6 +25,7 @@ import './user-items.scss';
 function UserItems(props) {
 
     const [user, setUser] = useState(props.user);
+    const [copyUser, setCopyUser] = useState({...user})
     const [open, setOpen] = useState(false);
 
     const [authorities] = useState([{ id: 1, authority: 'ROLE_ADMIN' }, { id: 2, authority: 'ROLE_USER' }]);
@@ -57,20 +58,31 @@ function UserItems(props) {
     };
 
     const usernameFormHandler = e => {
-        setUser({ ...user, [e.target.name]: e.target.value })
+        setCopyUser({ ...copyUser, [e.target.name]: e.target.value })
     }
 
     const enabledFormHandler = (newEnabled) => {
-        setUser({ ...user, enabled: newEnabled })
+        setCopyUser({ ...copyUser, enabled: newEnabled })
         setOpenListEnabled(false);
     }
 
     const authorityFormHandler = (e) => {
         console.log(e)
         if (e != null) {
-            setUser({ ...user, authority: { id: e.id, authority: authorities[e.id - 1].authority } })
+            setCopyUser({ ...copyUser, authority: { id: e.id, authority: authorities[e.id - 1].authority } })
         }
         setOpenListAuthority(false);
+    }
+
+    const cancel = () => {
+        setCopyUser({...user})
+        handleClose()
+    }
+
+    const update = () => {
+        props.onUpdate(copyUser)
+        setUser({...copyUser})
+        handleClose()
     }
 
     return (
@@ -115,12 +127,12 @@ function UserItems(props) {
                             name="username"
                             type="text"
                             onChange={usernameFormHandler}
-                            defaultValue={user.username}
+                            defaultValue={copyUser.username}
                             fullWidth
                         />
                         <List>
                             <ListItem button divider onClick={handleClickListItemEnabled}>
-                                <ListItemText primary="Enabled" secondary={user.enabled} />
+                                <ListItemText primary="Enabled" secondary={copyUser.enabled} />
                             </ListItem>
                             <ConfirmationEditDialogRowEnabled
                                 name="enabled"
@@ -128,13 +140,13 @@ function UserItems(props) {
                                 open={openListEnabled}
                                 onClose={handleCancelListItemEnabled}
                                 onOk={enabledFormHandler}
-                                defaultValue={user.enabled}
-                                valueEna={user.enabled}
+                                defaultValue={copyUser.enabled}
+                                valueEna={copyUser.enabled}
                             />
                         </List>
                         <List>
                             <ListItem button divider onClick={handleClickListItemAuthority}>
-                                <ListItemText primary="Authority" secondary={user.authority.authority} />
+                                <ListItemText primary="Authority" secondary={copyUser.authority.authority} />
                             </ListItem>
                             <ConfirmationEditDialogRowAuthority
                                 name="authority"
@@ -142,16 +154,16 @@ function UserItems(props) {
                                 open={openListAuthority}
                                 onClose={handleCancelListItemAuthority}
                                 onOk={authorityFormHandler}
-                                defaultValue={user.authority.authority}
-                                valueAuth={user.authority}
+                                defaultValue={copyUser.authority.authority}
+                                valueAuth={copyUser.authority}
                             />
                         </List>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleClose} color="primary">
+                        <Button onClick={cancel} color="primary">
                             Annuler
                                 </Button>
-                        <Button onClick={() => props.onUpdate(user)} color="primary">
+                        <Button onClick={update} color="primary">
                             Editer
                                 </Button>
                     </DialogActions>
