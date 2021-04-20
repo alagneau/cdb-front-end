@@ -9,7 +9,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 function ConfirmationDialogRowAuthority(props) {
     const { onClose, onOk, open,authorities, ...other } = props;
-    const [value, setValue] = useState({id: 1});
+    const [value, setValue] = useState({id: 2});
     const radioGroupRef = useRef(null);
 
     const handleEntering = () => {

@@ -127,6 +127,8 @@ function UserItems(props) {
                             onChange={usernameFormHandler}
                             defaultValue={copyUser.username}
                             fullWidth
+                            error={copyUser.username === ""}
+                            helperText={copyUser.username === "" ? 'Champ vide!' : ''}
                         />
                         <List>
                             <ListItem button divider onClick={handleClickListItemEnabled}>

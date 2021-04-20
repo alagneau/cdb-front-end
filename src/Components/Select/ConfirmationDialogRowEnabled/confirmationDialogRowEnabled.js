@@ -10,7 +10,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 function ConfirmationDialogRowEnabled(props) {
     const { onClose, onOk, open, ...other } = props;
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(1);
     const radioGroupRef = useRef(null);
     const enabled = [
         0,

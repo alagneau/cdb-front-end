@@ -40,11 +40,11 @@ function UserBoards() {
     const [userToDB, setUserToDB] = useState(
         {
             username: "",
-            enabled: Number,
+            enabled: 1,
             password: "excilys",
             authority: {
-                id: Number,
-                authority: ""
+                id: 2,
+                authority: "ROLE_USER"
             }
         }
     )
@@ -79,11 +79,11 @@ function UserBoards() {
         setUserToDB(
             {
                 username: "",
-                enabled: Number,
+                enabled: 1,
                 password: "excilys",
                 authority: {
-                    id: Number,
-                    authority: ""
+                    id: 2,
+                    authority: "ROLE_USER"
                 }
             }
         )
@@ -181,7 +181,7 @@ function UserBoards() {
         getApiList();
     }
 
-    const createUser = async (user) => {
+    const createUser = async () => {
         await fetch(`${url}/add`, {
             method: 'POST',
             headers: {
@@ -199,7 +199,7 @@ function UserBoards() {
             })
         });
         getApiList();
-        resetUserToDB()
+        handleClose();
     }
 
     const usernameFormHandler = e => {
@@ -257,6 +257,8 @@ function UserBoards() {
                             type="text"
                             onChange={usernameFormHandler}
                             fullWidth
+                            error={userToDB.username === ""}
+                            helperText={userToDB.username === "" ? 'Champ vide!' : ''}
                         />
                         <List key="enabledList">
                             <ListItem button divider onClick={handleClickListItemEnabled}>
@@ -288,7 +290,7 @@ function UserBoards() {
                         <Button onClick={handleClose} color="primary">
                             Annuler
                     </Button>
-                        <Button onClick={createUser} color="primary">
+                        <Button disabled={!userToDB.username} onClick={createUser} color="primary">
                             Ajouter
                     </Button>
                     </DialogActions>
