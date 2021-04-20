@@ -100,6 +100,7 @@ function UserBoards() {
             .then(data => data.json())
             .then(
                 (result) => {
+                    console.log(result)
                     setUsers(result);
                 },
                 (error) => {
@@ -161,7 +162,6 @@ function UserBoards() {
     }
 
     const updateUser = async (user) => {
-        console.log(user)
         await fetch(`${url}/update`, {
             method: 'PUT',
             headers: {
@@ -239,7 +239,7 @@ function UserBoards() {
         <div>
             <Search searchValue={searchValue} useSearch={onSearch} />
             <div className="show-items">
-                {filterList().map((elem) =>
+                {users.map((elem) =>
                     <UserItems onUpdate={updateUser}
                         authorities={authorities} user={elem} onDelete={deleteUser} onResetPassword={resetPassword} key={elem.id} />)}
                 <Button size="small" variant="outlined" color="primary" onClick={handleClickOpen}>

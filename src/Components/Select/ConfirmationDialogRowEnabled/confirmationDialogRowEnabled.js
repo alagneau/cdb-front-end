@@ -45,21 +45,21 @@ function ConfirmationDialogRowEnabled(props) {
             open={open}
         >
             <DialogContent dividers>
-                    <RadioGroup
-                        ref={radioGroupRef}
-                        value={value.toString()}
-                        onChange={handleChange}
-                        name="enabled"
-                    >
-                        {enabled.map((elem) => (
-                            <FormControlLabel
-                                value={elem.toString()}
-                                key={elem}
-                                control={<Radio />}
-                                label={elem}
-                            />
-                        ))}
-                    </RadioGroup>
+                <RadioGroup
+                    ref={radioGroupRef}
+                    value={value.toString()}
+                    onChange={handleChange}
+                    name="enabled"
+                >
+                    {enabled.map((elem) => (
+                        <FormControlLabel
+                            value={elem.toString()}
+                            key={elem}
+                            control={<Radio />}
+                            label={elem}
+                        />
+                    ))}
+                </RadioGroup>
             </DialogContent>
             <DialogActions>
                 <Button autoFocus onClick={handleCancel} color="primary">
