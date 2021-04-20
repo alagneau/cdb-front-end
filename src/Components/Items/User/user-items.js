@@ -9,87 +9,156 @@ import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Input from '@material-ui/core/Input';
 
+import List from "@material-ui/core/List";
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ConfirmationEditDialogRowAuthority from '../../Select/ConfirmationDialogRowAuthority/confirmationEditDialogRowAuthority'
+import ConfirmationEditDialogRowEnabled from '../../Select/ConfirmationDialogRowEnabled/confirmationEditDialogRowEnabled'
+
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
 import './user-items.scss';
 
 function UserItems(props) {
 
-    const [edit, setEdit] = useState(props.edit);
     const [user, setUser] = useState(props.user);
+    const [open, setOpen] = useState(false);
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            console.log(user)
-            props.onUpdate(user)
-            const temp = { ...user };
-            temp[e.target.name] = e.target.value;
-            setUser(temp)
-            setEdit(false);
-        } else if (e.key === 'Escape') {
-            setEdit(false);
+    const [authorities] = useState([{ id: 1, authority: 'ROLE_ADMIN' }, { id: 2, authority: 'ROLE_USER' }]);
+
+    const [openListEnabled, setOpenListEnabled] = useState(false);
+    const [openListAuthority, setOpenListAuthority] = useState(false);
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClickListItemEnabled = () => {
+        setOpenListEnabled(true);
+    };
+
+    const handleCancelListItemEnabled = () => {
+        setOpenListEnabled(false);
+    };
+
+    const handleClickListItemAuthority = () => {
+        setOpenListAuthority(true);
+    };
+
+    const handleCancelListItemAuthority = () => {
+        setOpenListAuthority(false);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const usernameFormHandler = e => {
+        setUser({ ...user, [e.target.name]: e.target.value })
+    }
+
+    const enabledFormHandler = (newEnabled) => {
+        setUser({ ...user, enabled: newEnabled })
+        setOpenListEnabled(false);
+    }
+
+    const authorityFormHandler = (e) => {
+        console.log(e)
+        if (e != null) {
+            setUser({ ...user, authority: { id: e.id, authority: authorities[e.id - 1].authority } })
         }
-    }
-
-    const updateUserName = (e) => {
-        let temp = { ...user };
-        temp[e.target.name] = e.target.value;
-        setUser(temp);
-    }
-
-    const updateEnabled = (e) => {
-        let temp = { ...user };
-        temp[e.target.name] = e.target.value;
-        setUser(temp);
-    }
-
-    const updateAuthority = (e) => {
-        let temp = { ...user };
-        temp.authority[e.target.name] = e.target.value;
-        setUser(temp);
+        setOpenListAuthority(false);
     }
 
     return (
         <Card className="card fade-in example-card">
             <CardContent>
-                {edit
-                    ? <form noValidate autoComplete="off" onKeyDown={(e) => handleKeyDown(e)}>
-                         <TextField id="standard-basic" name="username" label="Username" defaultValue={user.username} onChange={(e) => updateUserName(e)} />
-                         <TextField id="standard-basic" name="enabled" label="Enabled" defaultValue={user.enabled} onChange={(e) => updateEnabled(e)}/>
-                         <TextField id="standard-basic" name="authority" label="Authority" defaultValue={user.authority.authority} onChange={(e) => updateAuthority(e)}/>
-                      </form>
-                    : <p className="mat-card-header">
-                        <Typography>
-                            Username
+                <p className="mat-card-header">
+                    <Typography>
+                        Username
                         </Typography>
-                        <Typography>
-                            {user.username}
+                    <Typography>
+                        {user.username}
+                    </Typography>
+                    <Typography>
+                        Enabled
                         </Typography>
-                        <Typography>
-                            Enabled
+                    <Typography>
+                        {user.enabled}
+                    </Typography>
+                    <Typography>
+                        Authority
                         </Typography>
-                        <Typography>
-                            {user.enabled}
-                        </Typography>
-                        <Typography>
-                            Authority
-                        </Typography>
-                        <Typography>
-                            {user.authority.authority}
-                        </Typography>
-                    </p>}
+                    <Typography>
+                        {user.authority.authority}
+                    </Typography>
+                </p>
             </CardContent>
-            {!edit
-                ? <CardActions>
-                    <Button size="small" color="primary" onClick={() => props.onResetPassword(user)} >
-                        Reset password
+            <CardActions>
+                <Button size="small" color="primary" onClick={() => props.onResetPassword(user)} >
+                    Reset password
                     </Button>
-                    <Button size="small" color="primary">
-                        Edit
+                <Button size="small" color="primary" onClick={() => handleClickOpen()}>
+                    Edit
                     </Button>
-                    <Button color="secondary" variant="outlined"
-                        size="small" onClick={() => props.onDelete(user)}>Supprimer</Button>
-                </CardActions>
-                : <p>Entrer pour valider / Echap pour annuler</p>}
-
+                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                    <DialogTitle>Formulaire de création utilisateur</DialogTitle>
+                    <DialogContent>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="username"
+                            label="username"
+                            name="username"
+                            type="text"
+                            onChange={usernameFormHandler}
+                            defaultValue={user.username}
+                            fullWidth
+                        />
+                        <List>
+                            <ListItem button divider onClick={handleClickListItemEnabled}>
+                                <ListItemText primary="Enabled" secondary={user.enabled} />
+                            </ListItem>
+                            <ConfirmationEditDialogRowEnabled
+                                name="enabled"
+                                keepMounted
+                                open={openListEnabled}
+                                onClose={handleCancelListItemEnabled}
+                                onOk={enabledFormHandler}
+                                defaultValue={user.enabled}
+                                valueEna={user.enabled}
+                            />
+                        </List>
+                        <List>
+                            <ListItem button divider onClick={handleClickListItemAuthority}>
+                                <ListItemText primary="Authority" secondary={user.authority.authority} />
+                            </ListItem>
+                            <ConfirmationEditDialogRowAuthority
+                                name="authority"
+                                keepMounted
+                                open={openListAuthority}
+                                onClose={handleCancelListItemAuthority}
+                                onOk={authorityFormHandler}
+                                defaultValue={user.authority.authority}
+                                valueAuth={user.authority}
+                            />
+                        </List>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                            Annuler
+                                </Button>
+                        <Button onClick={() => props.onUpdate(user)} color="primary">
+                            Editer
+                                </Button>
+                    </DialogActions>
+                </Dialog>
+                <Button color="secondary" variant="outlined"
+                    size="small" onClick={() => props.onDelete(user)}>Supprimer</Button>
+            </CardActions>
         </Card>
     );
 }

@@ -168,23 +168,23 @@ function UserBoards() {
     }
 
     const updateUser = async (user) => {
-        console.log(
-            await fetch(`${url}/update`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+        console.log(user)
+        await fetch(`${url}/update`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                authority: {
+                    authority: `${user.authority.authority}`,
+                    id: `${user.authority.id}`
                 },
-                body: JSON.stringify({
-                    id: user.id,
-                    username: user.username,
-                    enabled: user.enabled,
-                    authority: {
-                        id: user.authority.id,
-                        authority: user.authority.authority
-                    }
-                })
-            }))
+                enabled: `${user.enabled}`,
+                id: `${user.id}`,
+                username: `${user.username}`
+            })
+        })
         getApiList();
     }
 
@@ -202,18 +202,18 @@ function UserBoards() {
     }
 
     const usernameFormHandler = e => {
-            setUserToDB({ ...userToDB, [e.target.name]: e.target.value })
+        setUserToDB({ ...userToDB, [e.target.name]: e.target.value })
     }
 
     const enabledFormHandler = newEnabled => {
-        setUserToDB({ ...userToDB, enabled : newEnabled })
+        setUserToDB({ ...userToDB, enabled: newEnabled })
         setOpenListEnabled(false);
     }
 
     const authorityFormHandler = e => {
-        let temp = {...authorityToDB}
-        temp.id=parseInt(e.target.value)
-        temp.authority=authorities[temp.id-1].authority
+        let temp = { ...authorityToDB }
+        temp.id = parseInt(e.target.value)
+        temp.authority = authorities[temp.id - 1].authority
         setAuthorityToDB(temp)
         setUserToDB({ ...userToDB, authority: authorityToDB })
         setOpenListAuthority(false);
@@ -238,15 +238,14 @@ function UserBoards() {
 
     return (
         <div>
-            <Search searchValue={searchValue} useSearch={onSearch}/>
+            <Search searchValue={searchValue} useSearch={onSearch} />
             <div className="show-items">
                 {filterList().map((elem) =>
                     <UserItems onUpdate={updateUser}
-                        edit={edit} user={elem} onUpdate={updateUser} onDelete={deleteUser} onResetPassword={resetPassword} key={elem.id} />)}
+                        authorities={authorities} user={elem} onDelete={deleteUser} onResetPassword={resetPassword} key={elem.id} />)}
                 <Button size="small" variant="outlined" color="primary" onClick={handleClickOpen}>
                     Créer un utilisateur
             </Button>
-
                 <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                     <DialogTitle>Formulaire de création utilisateur</DialogTitle>
                     <DialogContent>

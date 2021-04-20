@@ -1,6 +1,5 @@
 import { React, useState, useEffect, useRef } from 'react';
 import Button from "@material-ui/core/Button";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
 import Dialog from "@material-ui/core/Dialog";
@@ -8,14 +7,11 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
-function ConfirmationDialogRowEnabled(props) {
-    const { onClose, onOk, open, ...other } = props;
-    const [value, setValue] = useState(0);
+function ConfirmationEditDialogRowAuthority(props) {
+    const { onClose, onOk, valueAuth, open, ...other } = props;
+    const [value, setValue] = useState(valueAuth);
     const radioGroupRef = useRef(null);
-    const enabled = [
-        0,
-        1
-    ];
+    const [authorities] = useState([{ id: 1, authority: 'ROLE_ADMIN' }, { id: 2, authority: 'ROLE_USER' }]);
 
     const handleEntering = () => {
         if (radioGroupRef.current != null) {
@@ -24,16 +20,15 @@ function ConfirmationDialogRowEnabled(props) {
     };
 
     const handleCancel = () => {
-        console.log(other)
         onClose();
     };
 
     const handleOk = () => {
-        onOk(parseInt(value));
+        onOk(value);
     };
 
     const handleChange = (event) => {
-        setValue(event.target.value);
+        setValue({id: parseInt(event.target.value)});
     };
 
     return (
@@ -43,23 +38,24 @@ function ConfirmationDialogRowEnabled(props) {
             maxWidth="xs"
             onEntering={handleEntering}
             open={open}
+            {...other}
         >
             <DialogContent dividers>
-                    <RadioGroup
-                        ref={radioGroupRef}
-                        value={value.toString()}
-                        onChange={handleChange}
-                        name="enabled"
-                    >
-                        {enabled.map((elem) => (
-                            <FormControlLabel
-                                value={elem.toString()}
-                                key={elem}
-                                control={<Radio />}
-                                label={elem}
-                            />
-                        ))}
-                    </RadioGroup>
+                <RadioGroup
+                    ref={radioGroupRef}
+                    value={value.id.toString()}
+                    onChange={handleChange}
+                    name="authority"
+                >
+                    {authorities.map((elem) => (
+                        <FormControlLabel
+                            value={elem.id.toString()}
+                            key={elem.id}
+                            control={<Radio />}
+                            label={elem.authority}
+                        />
+                    ))}
+                </RadioGroup>
             </DialogContent>
             <DialogActions>
                 <Button autoFocus onClick={handleCancel} color="primary">
@@ -73,4 +69,4 @@ function ConfirmationDialogRowEnabled(props) {
     );
 }
 
-export default ConfirmationDialogRowEnabled;
+export default ConfirmationEditDialogRowAuthority;

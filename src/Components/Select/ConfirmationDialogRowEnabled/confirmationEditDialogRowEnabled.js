@@ -8,9 +8,9 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
-function ConfirmationDialogRowEnabled(props) {
-    const { onClose, onOk, open, ...other } = props;
-    const [value, setValue] = useState(0);
+function ConfirmationEditDialogRowEnabled(props) {
+    const { onClose, onOk, valueEna, open, ...other } = props;
+    const [value, setValue] = useState(valueEna);
     const radioGroupRef = useRef(null);
     const enabled = [
         0,
@@ -24,7 +24,6 @@ function ConfirmationDialogRowEnabled(props) {
     };
 
     const handleCancel = () => {
-        console.log(other)
         onClose();
     };
 
@@ -43,6 +42,7 @@ function ConfirmationDialogRowEnabled(props) {
             maxWidth="xs"
             onEntering={handleEntering}
             open={open}
+            {...other}
         >
             <DialogContent dividers>
                     <RadioGroup
@@ -73,4 +73,4 @@ function ConfirmationDialogRowEnabled(props) {
     );
 }
 
-export default ConfirmationDialogRowEnabled;
+export default ConfirmationEditDialogRowEnabled;
