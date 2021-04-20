@@ -8,10 +8,9 @@ import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 function ConfirmationDialogRowAuthority(props) {
-    const { onClose, onOk, open, ...other } = props;
-    const [value, setValue] = useState(1);
+    const { onClose, onOk, open,authorities, ...other } = props;
+    const [value, setValue] = useState({id: 1});
     const radioGroupRef = useRef(null);
-    const [authorities, setAuthorities] = useState([{ id: 1, authority: 'ROLE_ADMIN' }, { id: 2, authority: 'ROLE_USER' }]);
 
     const handleEntering = () => {
         if (radioGroupRef.current != null) {
@@ -24,11 +23,12 @@ function ConfirmationDialogRowAuthority(props) {
     };
 
     const handleOk = () => {
-        onOk(parseInt(value));
+        onOk(value);
     };
 
     const handleChange = (event) => {
-        setValue({id: parseInt(event.target.value)});
+        console.log(event)
+        setValue({ id: parseInt(event.target.value )});
     };
 
     return (
@@ -38,38 +38,24 @@ function ConfirmationDialogRowAuthority(props) {
             maxWidth="xs"
             onEntering={handleEntering}
             open={open}
+            {...other}
         >
             <DialogContent dividers>
-                {value ? <RadioGroup
+                <RadioGroup
                     ref={radioGroupRef}
-                    value={value.toString()}
+                    value={value.id.toString()}
                     onChange={handleChange}
                     name="authority"
                 >
                     {authorities.map((elem) => (
                         <FormControlLabel
                             value={elem.id.toString()}
+                            key={elem.id}
                             control={<Radio />}
                             label={elem.authority}
                         />
                     ))}
                 </RadioGroup>
-                    :
-                    <RadioGroup
-                        ref={radioGroupRef}
-                        value={authorities[0].id.toString()}
-                        onChange={handleChange}
-                        name="authority"
-                    >
-
-                        {authorities.map((elem) => (
-                            <FormControlLabel
-                                value={elem.id.toString()}
-                                control={<Radio />}
-                                label={elem.authority}
-                            />
-                        ))}
-                    </RadioGroup>}
             </DialogContent>
             <DialogActions>
                 <Button autoFocus onClick={handleCancel} color="primary">

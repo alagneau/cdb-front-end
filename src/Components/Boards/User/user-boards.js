@@ -48,12 +48,6 @@ function UserBoards() {
             }
         }
     )
-    const [authorityToDB, setAuthorityToDB] = useState(
-        {
-            id: 0,
-            authority: ""
-        }
-    )
 
     const handleClickListItemEnabled = () => {
         setOpenListEnabled(true);
@@ -132,7 +126,6 @@ function UserBoards() {
                     setError(error);
                 }
             );
-        console.log(authorities)
     }
 
 
@@ -195,7 +188,15 @@ function UserBoards() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
-            body: JSON.stringify(userToDB)
+            body: JSON.stringify({
+                username: `${userToDB.username}`,
+                enabled: `${userToDB.enabled}`,
+                password: "excilys",
+                authority: {
+                    id: `${userToDB.authority.id}`,
+                    authority: `${userToDB.authority.authority}`
+                }
+            })
         });
         getApiList();
         resetUserToDB()
@@ -207,15 +208,13 @@ function UserBoards() {
 
     const enabledFormHandler = newEnabled => {
         setUserToDB({ ...userToDB, enabled: newEnabled })
+        console.log(userToDB)
         setOpenListEnabled(false);
     }
 
     const authorityFormHandler = e => {
-        let temp = { ...authorityToDB }
-        temp.id = parseInt(e.target.value)
-        temp.authority = authorities[temp.id - 1].authority
-        setAuthorityToDB(temp)
-        setUserToDB({ ...userToDB, authority: authorityToDB })
+        console.log(e)
+        setUserToDB({ ...userToDB, authority: { id: e.id, authority: authorities[e.id - 1].authority } })
         setOpenListAuthority(false);
     }
 
@@ -269,7 +268,6 @@ function UserBoards() {
                                 open={openListEnabled}
                                 onClose={handleCancelListItemEnabled}
                                 onOk={enabledFormHandler}
-                                value={userToDB.enabled}
                             />
                         </List>
                         <List key="authorityList">
@@ -281,8 +279,7 @@ function UserBoards() {
                                 keepMounted
                                 open={openListAuthority}
                                 onClose={handleCancelListItemAuthority}
-                                onChange={authorityFormHandler}
-                                value={userToDB.authority.authority}
+                                onOk={authorityFormHandler}
                                 authorities={authorities}
                             />
                         </List>
