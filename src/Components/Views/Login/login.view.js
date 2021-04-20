@@ -87,17 +87,15 @@ export function LoginView(props) {
                 password: user.password
             })
             .then(response => {
-                console.log(response)
                 if (response.status === 200) {
                     setUser({...user, "password": ""})
                     localStorage.setItem("access_token", response.data.access_token)
                     localStorage.setItem("refresh_token", response.data.refresh_token)
+                    localStorage.setItem("user_role", response.data.role)
                     handleConnected("true")
                 }
             }).catch(error => {
-                console.log(error)
                 setInfoMessage("Mauvaise combinaison username / password")
-                console.log(localStorage.getItem("login_message"))
             })
     }
 
@@ -150,7 +148,7 @@ export function LoginView(props) {
             </div>
 
             <div>
-                <img style={{width: "600px"}} src="login_image.jpg"/>
+                <img style={{width: "600px"}} src="login_image.jpg" alt="Exemple d'une page du site"/>
             </div>
             {(connected==="true") && <Redirect to={props.path} {...props}/>}
         </div>
