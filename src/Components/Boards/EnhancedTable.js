@@ -22,6 +22,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SearchBar from "material-ui-search-bar";
 import ComputerRow from '../Items/ComputerRow';
 import Button from '@material-ui/core/Button';
+import { TextField } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
 
 
 
@@ -206,9 +208,9 @@ const useToolbarStyles = makeStyles((theme) => ({
 const EnhancedTableToolbar = (props) => {
 
   const classes = useToolbarStyles();
-  const { numSelected, handleDelete } = props;
+  const { numSelected, handleDelete, handleSearch } = props;
 
-
+  const [search, setSearch] = useState("");
 
 
   return (
@@ -234,7 +236,10 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       ) : ( 
-        <SearchBar />
+        <div>
+          <SearchIcon onClick={() => handleSearch(search)} />
+          <TextField onChange={(newValue) => setSearch(newValue)} />
+        </div>
       )
       }
     </Toolbar>
@@ -549,11 +554,47 @@ export default function EnhancedTable() {
   }
 
 
+
+  const handleSearch = (search) => {
+
+    console.log(search.target.value);
+
+    let urlSearch = `${urlComputer}/search`;
+
+    if (typeof orderBy !== 'undefined') {
+      urlSearch = urlSearch.concat(`/order/page`); 
+    }
+    else {
+      urlSearch = urlSearch.concat(`/page`);
+    }
+
+    urlSearch = urlSearch.concat(`/${pageNumber}/${rowsPerPage}?search=${search.target.value}`);
+
+    fetch(urlSearch, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+      }
+    })
+    .then((data) => data.json() )
+    .then((result) => {
+      console.log('result');
+      console.log(result);
+      let searchedRows = [];
+      result.map( computer => searchedRows.push(createData(computer)) );
+      setRows(searchedRows);
+    });
+  }
+
+
+
   return (
     <div align="left" className={classes.root}>
       <Paper className={classes.paper}>
         <EnhancedTableToolbar numSelected={selected.length} 
-                              handleDelete={handleDelete} />
+                              handleDelete={handleDelete}
+                              handleSearch={handleSearch} />
         <TableContainer>
           <Table
             className={classes.table}
@@ -576,7 +617,6 @@ export default function EnhancedTable() {
               {rows.map((row, index) => {
                 const isItemSelected = isSelected(row.name);
                 const labelId = `enhanced-table-checkbox-${index}`;
-
                 return (
                           <ComputerRow key={row.name}
                             row={row}
