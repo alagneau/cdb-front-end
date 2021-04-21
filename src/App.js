@@ -7,6 +7,7 @@ import { baseURL } from './libs/context';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import AppBar from './Components/Header/App-Bar/appBar'
+import UserView from './Components/Views/User/user-view';
 
 function App() {
     useEffect(() => {
@@ -53,7 +54,7 @@ function App() {
                     <RouteCDB exact path="/" component={HomeView} update={handleHeader}/>
                     <RouteCDB exact path="/computer" component={HomeView} update={handleHeader}/>
                     <RouteCDB exact path="/company" component={HomeView} update={handleHeader}/>
-                    <RouteCDB exact path="/user" component={HomeView} update={handleHeader}/>
+                    <RouteCDB exact path="/user" component={UserView} update={handleHeader}/>
                     <RouteCDB exact path="/logout" component={Logout} update={handleHeader}/>
                     <RouteCDB path="/" component={HomeView} update={handleHeader}/>
                 </Switch>
