@@ -24,6 +24,8 @@ import ComputerRow from '../Items/ComputerRow';
 import Button from '@material-ui/core/Button';
 import { TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
+import axios from 'axios';
+
 
 
 
@@ -208,7 +210,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 const EnhancedTableToolbar = (props) => {
 
   const classes = useToolbarStyles();
-  const { numSelected, handleDelete, handleSearch } = props;
+  const { numSelected, handleDelete, handleSearch, setAddOpenedWindow } = props;
 
   const [search, setSearch] = useState("");
 
@@ -226,6 +228,7 @@ const EnhancedTableToolbar = (props) => {
       ) : (
         <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
           Computers
+          <Button color="primary" onClick={() => setAddOpenedWindow(true)} >Add Computer</Button>
         </Typography>
       )}
 
@@ -252,6 +255,12 @@ EnhancedTableToolbar.propTypes = {
 };
 
 
+
+
+const AddWindow = (props) => {
+  const { addWindowOpened } = props;
+
+}
 
 
 
@@ -298,18 +307,19 @@ export default function EnhancedTable() {
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState();
   const [companies, setCompanies] = useState([]);
+  const [addWindowOpened, setAddWindowOpened] = useState(false);
 
 
   const getCompanies = () => {
-    fetch(`${urlCompany}/list`,
+    axios(
       {
+        url: `${urlCompany}/list`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
         }
       })
-      .then( data => data.json() )
-      .then( result =>  setCompanies(result) );
+      .then( result =>  setCompanies(result.data) );
   }
 
 
@@ -353,18 +363,18 @@ export default function EnhancedTable() {
 
 
   const getApiList = () => {
-    fetch(`${urlComputer}/page/${pageNumber}/${rowsPerPage}`,
+    axios(
         {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            }
+          url: `${urlComputer}/page/${pageNumber}/${rowsPerPage}`,
+          method: 'GET',
+          headers: {
+              'Authorization': `Bearer ${token}`,
+          }
         })
-        .then(data => data.json())
         .then(
             (result) => {
               let newRows = [];
-              result.map( computer => newRows.push(createData(computer)) );
+              result.data.map( computer => newRows.push(createData(computer)) );
               setRows(newRows);
             }
         );
@@ -375,15 +385,15 @@ export default function EnhancedTable() {
 
 
   const getComputerCount = () => {
-    fetch(`${urlComputer}/count`,
+    axios(
     {
+      url: `${urlComputer}/count`,
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
       }
     })
-    .then( data => data.json() )
-    .then( result => setTotalRows( result ) );
+    .then( result => setTotalRows( result.data ) );
   }
 
 
@@ -395,17 +405,17 @@ export default function EnhancedTable() {
     let sort = order === 'asc' ? 'ASC' : 'DESC';
     let orderField = orderBy === 'company_name' ? 'company' : orderBy;
 
-    fetch(`${urlComputer}/order/page/${pageNumber}/${rowsPerPage}?orderField=${orderField}&sort=${sort}`,
+    axios(
     {
+      url: `${urlComputer}/order/page/${pageNumber}/${rowsPerPage}?orderField=${orderField}&sort=${sort}`,
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
       }
     })
-    .then( data => data.json() )
     .then( result => {
       let newRows = [];
-      result.map( computer => newRows.push(createData(computer)) );
+      result.data.map( computer => newRows.push(createData(computer)) );
       setRows(newRows);
     });
   }
@@ -488,8 +498,9 @@ export default function EnhancedTable() {
 
     if ( selected !== [] ) {
       selected.map( id => {
-        fetch(`${urlComputer}/delete?id=${id}`,
+        axios(
         {
+          url: `${urlComputer}/delete?id=${id}`,
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -528,20 +539,21 @@ export default function EnhancedTable() {
       }; 
     }
 
-    fetch(`${urlComputer}/update`, {
+    axios( {
+      url: `${urlComputer}/update`,
       method: 'PUT',
       headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({
+      data: JSON.stringify({
         company: company,
         discontinued: rowEdited.discontinued,
         id: rowEdited.id,
         introduced: rowEdited.introduced,
         name: rowEdited.name
       })
-    }).then( result => console.log(result) );
+    }).then( result => console.log(result.data) );
 
     if ( typeof orderBy === 'undefined' ) {
       getApiList();
@@ -568,19 +580,17 @@ export default function EnhancedTable() {
 
     urlSearch = urlSearch.concat(`/${pageNumber}/${rowsPerPage}?search=${search.target.value}`);
 
-    fetch(urlSearch, {
+    axios( {
+      url: urlSearch,
       method: 'GET',
       headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
       }
     })
-    .then((data) => data.json() )
     .then((result) => {
-      console.log('result');
-      console.log(result);
       let searchedRows = [];
-      result.map( computer => searchedRows.push(createData(computer)) );
+      result.data.map( computer => searchedRows.push(createData(computer)) );
       setRows(searchedRows);
     });
   }
@@ -589,6 +599,7 @@ export default function EnhancedTable() {
 
   return (
     <div align="left" className={classes.root}>
+
       <Paper className={classes.paper}>
         <EnhancedTableToolbar numSelected={selected.length} 
                               handleDelete={handleDelete}
