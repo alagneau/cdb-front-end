@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -20,29 +20,35 @@ import TableRow from '@material-ui/core/TableRow';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import Paper from '@material-ui/core/Paper';
+import { baseURL } from "../../../libs/context";
+import axios from 'axios';
 
 function CompanyItem(props) {
-    const [edit, setEdit] = useState(props.edit);
+    const [edit, setEdit] = useState(false);
     const [company, setCompany] = useState(props.company);
-    const token = localStorage.getItem('access_token');
     const [computers, setComputers] = useState([]);
-    const url = 'http://localhost:8080/webapp/APIComputer';
+    const url = baseURL + "/APIComputer";
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [error, setError] = useState();
+    const [countComputers, setCountComputers] = useState(0)
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
-        fetch(`${url}/ByCompany/${company.id}/page/${newPage}/10`,
+        axios(
             {
+                url: `${url}/ByCompany/${company.id}/page/${newPage}/10`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    setComputers(result);
+                    setComputers(result.data);
+                },
+                (error) => {
+                    setError(error);
                 }
             );
     };
@@ -51,19 +57,23 @@ function CompanyItem(props) {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
         const limit = parseInt(event.target.value, 10);
-        fetch(`${url}/ByCompany/${company.id}/page/0/${limit}`,
+        axios(
             {
+                url: `${url}/ByCompany/${company.id}/page/0/${limit}`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    setComputers(result);
+                    setComputers(result.data);
+                },
+                (error) => {
+                    setError(error);
                 }
-            );
+            )
+            ;
     };
 
     const [open, setOpen] = useState(false);
@@ -92,18 +102,40 @@ function CompanyItem(props) {
         }
     }
 
-    const getComputers = () => {
-        fetch(`${url}/ByCompany/${company.id}/page/${page}/${rowsPerPage}`,
+    const getCountComputer = () => {
+        axios(
             {
+                url: `${url}/count/ByCompany/${company.id}`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    setComputers(result);
+                    setCountComputers(result.data);
+                },
+                (error) => {
+                    setError(error);
+                }
+            );
+    }
+
+    const getComputers = () => {
+        axios(
+            {
+                url: `${url}/ByCompany/${company.id}/page/${page}/${rowsPerPage}`,
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                }
+            })
+            .then(
+                (result) => {
+                    setComputers(result.data);
+                },
+                (error) => {
+                    setError(error);
                 }
             );
     }
@@ -115,31 +147,28 @@ function CompanyItem(props) {
                     <Avatar src="https://previews.123rf.com/images/iamnee/iamnee1301/iamnee130100165/17417606-fourniture-de-bureau-une-illustration-de-dessin-anim%C3%A9-d-ordinateur-personnel-de-bureau-dans-circle-.jpg" />
                 }
                 title={edit
-                    ? <input type="text" defaultValue={company.name} name="name" autoFocus type="text" onKeyDown={(e) => handleKeyDown(e, company.id)} />
+                    ? <input type="text" defaultValue={company.name} name="name" autoFocus onKeyDown={(e) => handleKeyDown(e, company.id)} />
                     : <p className="mat-card-header" onDoubleClick={() => { setEdit(true) }}>
                         {company.name}
                     </p>}
             />
             <CardActions>
                 <Button color="secondary" variant="outlined"
-                    size="small" onClick={() => props.onDelete(company)}>Supprimer</Button>
-                <Button color="primary" variant="outlined" size="small" onClick={() => { handleClickOpen(); getComputers() }}>
-                    Détails
+                    size="small" onClick={() => props.onDelete(company)}>Delete</Button>
+                <Button color="primary" variant="outlined" size="small" onClick={() => { handleClickOpen(); getComputers(); getCountComputer(); }}>
+                    Details
                 </Button>
                 <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
                     <DialogTitle>{company.name}</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            {/* <div style={{ height: 400, width: '100%' }}>
-                                <DataGrid rows={rows} columns={columns} pageSize={5} checkboxSelection />
-                            </div> */}
                             <TableContainer component={Paper}>
                                 <Table size="small" aria-label="a dense table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell>Nom</TableCell>
-                                            <TableCell align="center">Date d'introduction</TableCell>
-                                            <TableCell align="right">Date d'abandon</TableCell>
+                                            <TableCell>Name</TableCell>
+                                            <TableCell align="center">Introduced date</TableCell>
+                                            <TableCell align="right">Discontinued date</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -157,7 +186,7 @@ function CompanyItem(props) {
                                         <TableRow>
                                             <TablePagination
                                                 component="div"
-                                                count={50}
+                                                count={countComputers}
                                                 page={page}
                                                 rowsPerPage={rowsPerPage}
                                                 onChangePage={handleChangePage}
@@ -172,7 +201,7 @@ function CompanyItem(props) {
                     <DialogActions>
                         <Button open={open} onClick={handleClose} color="secondary" variant="outlined"
                             size="small" endIcon={<CloseIcon />}>
-                            Annuler
+                            Cancel
                         </Button>
                     </DialogActions>
                 </Dialog>

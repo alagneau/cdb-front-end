@@ -12,52 +12,49 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import CloseIcon from '@material-ui/icons/Close';
 import TablePagination from '@material-ui/core/TablePagination';
+import axios from "axios";
+import { baseURL } from "../../../libs/context";
 
 export default function CompanyBoard() {
 
-    const url = 'http://localhost:8080/webapp/APICompany';
-    const [edit, setEdit] = useState(false);
+    const url = baseURL + "/APICompany";
     const [companies, setCompanies] = useState([]);
-    const [error, setError] = useState(null);
-    const token = localStorage.getItem('access_token');
     const [open, setOpen] = useState(false);
     const [name, setName] = useState("");
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [ count, setCount ] = useState(0);
+    const [count, setCount] = useState(0);
+    const [error, setError] = useState([]);
 
     const countCompanies = async () => {
-        await fetch(`${url}/count`,
+        await axios(
             {
+                url: `${url}/count`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    setCount(result);
-                },
-                (error) => {
-                    setError(error);
+                    setCount(result.data);
                 }
             );
     }
 
     const handleChangePage = async (event, newPage) => {
         setPage(newPage);
-        await fetch(`${url}/page/${newPage}/${rowsPerPage}`,
+        await axios(
             {
+                url: `${url}/page/${newPage}/${rowsPerPage}`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    setCompanies(result);
+                    setCompanies(result.data);
                 },
                 (error) => {
                     setError(error);
@@ -70,17 +67,17 @@ export default function CompanyBoard() {
         setPage(0);
         const limit = parseInt(event.target.value, 10);
         const index = 0;
-        await fetch(`${url}/page/${index}/${limit}`,
+        await axios(
             {
+                url: `${url}/page/${index}/${limit}`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    setCompanies(result);
+                    setCompanies(result.data);
                 },
                 (error) => {
                     setError(error);
@@ -98,17 +95,17 @@ export default function CompanyBoard() {
     };
 
     const getApiList = async () => {
-        await fetch(`${url}/page/${page}/${rowsPerPage}`,
+        await axios(
             {
+                url: `${url}/page/${page}/${rowsPerPage}`,
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
                 }
             })
-            .then(data => data.json())
             .then(
                 (result) => {
-                    setCompanies(result);
+                    setCompanies(result.data);
                 },
                 (error) => {
                     setError(error);
@@ -117,44 +114,50 @@ export default function CompanyBoard() {
     }
 
     const deleteCompany = async (company) => {
-        await fetch(`${url}/delete?id=` + company.id, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            }
-        });
+        await axios(
+            {
+                url: `${url}/delete?id=` + company.id,
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                }
+            });
         getApiList();
         countCompanies();
     }
 
     const updateCompany = async (event, id) => {
-        await fetch(`${url}/update`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                id: id,
-                logo: 'https://previews.123rf.com/images/iamnee/iamnee1301/iamnee130100165/17417606-fourniture-de-bureau-une-illustration-de-dessin-anim%C3%A9-d-ordinateur-personnel-de-bureau-dans-circle-.jpg',
-                name: `${event.target.value}`
-            })
-        });
+        await axios(
+            {
+                url: `${url}/update`,
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                },
+                data: JSON.stringify({
+                    id: id,
+                    logo: 'https://previews.123rf.com/images/iamnee/iamnee1301/iamnee130100165/17417606-fourniture-de-bureau-une-illustration-de-dessin-anim%C3%A9-d-ordinateur-personnel-de-bureau-dans-circle-.jpg',
+                    name: `${event.target.value}`
+                })
+            });
         getApiList();
     }
 
     const createCompany = async (company) => {
-        await fetch(`${url}/add`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                logo: 'https://previews.123rf.com/images/iamnee/iamnee1301/iamnee130100165/17417606-fourniture-de-bureau-une-illustration-de-dessin-anim%C3%A9-d-ordinateur-personnel-de-bureau-dans-circle-.jpg',
-                name: `${company.target.value}`
-            })
-        });
+        await axios(
+            {
+                url: `${url}/add`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+                },
+                data: JSON.stringify({
+                    logo: 'https://previews.123rf.com/images/iamnee/iamnee1301/iamnee130100165/17417606-fourniture-de-bureau-une-illustration-de-dessin-anim%C3%A9-d-ordinateur-personnel-de-bureau-dans-circle-.jpg',
+                    name: `${company.target.value}`
+                })
+            });
         getApiList();
         countCompanies();
     }
@@ -173,43 +176,45 @@ export default function CompanyBoard() {
     }
 
     return (
-        <div className="show-recipes">
-            {companies.map((elem) =>
-                <CompanyItem onUpdate={updateCompany}
-                    edit={edit} company={elem} onDelete={deleteCompany} key={elem.id} />)}
-            <Button size="small" variant="outlined" color="primary" onClick={handleClickOpen}>
-                Créer une entreprise
+        <div>
+            <div className="show-recipes">
+                {companies.map((elem) =>
+                    <CompanyItem onUpdate={updateCompany}
+                        company={elem} onDelete={deleteCompany} key={elem.id} />)}
+                <Button size="small" variant="outlined" color="primary" onClick={handleClickOpen}>
+                    Add a company
             </Button>
-            <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Formulaire de création</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Entrer un nom d'entreprise à créer.
+                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Creation form</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            Name of the new company.
                     </DialogContentText>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        label="Nom"
-                        type="text"
-                        fullWidth
-                        onChange={handleChange}
-                        error={name === ""}
-                        helperText={name === "" ? 'Champ vide!' : ''}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose} color="secondary" variant="outlined"
-                        size="small" endIcon={<CloseIcon />}>
-                        Annuler
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="Name"
+                            type="text"
+                            fullWidth
+                            onChange={handleChange}
+                            error={name === ""}
+                            helperText={name === "" ? 'Empty field!' : ''}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} color="secondary" variant="outlined"
+                            size="small" endIcon={<CloseIcon />}>
+                            Cancel
                     </Button>
-                    <Button size="small" variant="outlined" disabled={!name}
-                        onClick={() => { createCompany(name); handleClose(); setName('') }}
-                        color="primary" endIcon={<SaveAltIcon />}>
-                        Créer
+                        <Button size="small" variant="outlined" disabled={!name}
+                            onClick={() => { createCompany(name); handleClose(); setName('') }}
+                            color="primary" endIcon={<SaveAltIcon />}>
+                            Create
                     </Button>
-                </DialogActions>
-            </Dialog>
+                    </DialogActions>
+                </Dialog>
+            </div>
             <TablePagination
                 component="div"
                 count={count}
