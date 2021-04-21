@@ -19,12 +19,24 @@ import Tooltip from '@material-ui/core/Tooltip';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
-import SearchBar from "material-ui-search-bar";
 import ComputerRow from '../Items/ComputerRow';
 import Button from '@material-ui/core/Button';
 import { TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import axios from 'axios';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import CloseIcon from '@material-ui/icons/Close';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
+
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+
+
+
 
 
 
@@ -228,7 +240,6 @@ const EnhancedTableToolbar = (props) => {
       ) : (
         <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
           Computers
-          <Button color="primary" onClick={() => setAddOpenedWindow(true)} >Add Computer</Button>
         </Typography>
       )}
 
@@ -254,13 +265,6 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-
-
-
-const AddWindow = (props) => {
-  const { addWindowOpened } = props;
-
-}
 
 
 
@@ -308,6 +312,12 @@ export default function EnhancedTable() {
   const [totalRows, setTotalRows] = useState();
   const [companies, setCompanies] = useState([]);
   const [addWindowOpened, setAddWindowOpened] = useState(false);
+  
+  const [name, setName] = useState(null);
+  const [introduced, setIntroduced] = useState(null);
+  const [discontinued, setDiscontinued] = useState(null);
+  const [company, setCompany] = useState(null);
+
 
 
   const getCompanies = () => {
@@ -494,7 +504,6 @@ export default function EnhancedTable() {
 
   // TO CHANGE
   const handleDelete = () => {
-    console.log(selected);
 
     if ( selected !== [] ) {
       selected.map( id => {
@@ -526,12 +535,9 @@ export default function EnhancedTable() {
 
 
   const handleEdit = (rowEdited) => {
-    console.log('Inside edit');
-    console.log(rowEdited);
     
     let company = null;
     if ( rowEdited.company_id !== null && rowEdited.company_name !== null ) {
-      console.log('company creation');
       company = { 
         id: rowEdited.company_id, 
         logo: null,
@@ -553,7 +559,7 @@ export default function EnhancedTable() {
         introduced: rowEdited.introduced,
         name: rowEdited.name
       })
-    }).then( result => console.log(result.data) );
+    });
 
     if ( typeof orderBy === 'undefined' ) {
       getApiList();
@@ -566,8 +572,6 @@ export default function EnhancedTable() {
 
 
   const handleSearch = (search) => {
-
-    console.log(search.target.value);
 
     let urlSearch = `${urlComputer}/search`;
 
@@ -597,8 +601,129 @@ export default function EnhancedTable() {
 
 
 
+  const handleChangeName = (event) => {
+    setName(event.target.value);
+  }
+  const handleChangeIntroduced = (event) => {
+    setIntroduced(event.target.value);
+  }
+  const handleChangeDiscontinued = (event) => {
+    setDiscontinued(event.target.value);
+  }
+  const handleChangeCompany = (event) => {
+    setCompany(event.target.value);
+  }
+
+  const handleAddComputer = () => {
+
+    if ( name !== null ) {
+      axios({
+        url: `${urlComputer}/add`,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        data: JSON.stringify({
+          company: company,
+          discontinued: discontinued,
+          id: 0,
+          introduced: introduced,
+          name: name
+        })
+      });
+
+      alert('Your computer has been successfully added to the database');
+    }
+    else {
+      alert('Error: The computer name is null');
+    }
+    
+    setAddWindowOpened(false);
+    setName(null);
+    setIntroduced(null);
+    setDiscontinued(null);
+    setCompany(null);
+
+    if ( typeof orderBy === 'undefined' ) {
+      getApiList();
+    }
+    else {
+      getSortedApiList();
+    }
+  }
+
+
+
   return (
     <div align="left" className={classes.root}>
+      <Button color="primary" onClick={() => setAddWindowOpened(true)} >Add Computer</Button>
+        
+      <Dialog open={addWindowOpened}>
+        <DialogTitle id="form-dialog-title">Add a Computer</DialogTitle>
+        <DialogContent>
+          <TextField
+              required
+              autoFocus
+              margin="dense"
+              label="Computer Name"
+              type="text"
+              fullWidth
+              onChange={handleChangeName}
+          />
+          <br />
+          <br />
+          <br />
+          <DialogContentText>
+            Introduced Date
+          </DialogContentText>
+          <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              type="date"
+              fullWidth
+              onChange={handleChangeIntroduced}
+          />
+          <br />
+          <br />
+          <br />
+          <DialogContentText>
+            Discontinued Date
+          </DialogContentText>
+          <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              type="date"
+              fullWidth
+              onChange={handleChangeDiscontinued}
+          />
+          <br />
+          <br />
+          <Select
+            displayEmpty={true}
+            autoWidth={true}
+            onChange={handleChangeCompany}
+          >
+            {companies.map( (company, index) => {
+              return (<MenuItem value={company}>{company.name}</MenuItem>);
+            })}
+          </Select>
+        </DialogContent>
+      <DialogActions>
+          <Button onClick={() => setAddWindowOpened(false)} color="secondary" variant="outlined"
+              size="small" endIcon={<CloseIcon />}>
+              Cancel
+      </Button>
+          <Button size="small" variant="outlined" 
+              color="primary" endIcon={<SaveAltIcon />}
+              onClick={handleAddComputer}>
+              Add
+      </Button>
+      </DialogActions>
+      </Dialog>
+
 
       <Paper className={classes.paper}>
         <EnhancedTableToolbar numSelected={selected.length} 
