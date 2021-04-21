@@ -9,8 +9,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ConfirmationDialogRowAuthority from '../../Select/ConfirmationDialogRowAuthority/confirmationDialogRowAuthority'
 import ConfirmationDialogRowEnabled from '../../Select/ConfirmationDialogRowEnabled/confirmationDialogRowEnabled'
 
-import Search from '../../Input/Search/search'
-
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -21,17 +19,12 @@ import axios from 'axios';
 
 function UserBoards() {
 
-    const token = localStorage.getItem("access_token");
 
     const url = 'http://localhost:8080/webapp/APIUser';
     const [users, setUsers] = useState([]);
     const url_authorities = 'http://localhost:8080/webapp/APIAuthorities';
     const [authorities, setAuthorities] = useState([])
 
-    const [error, setError] = useState(null);
-
-    const [searchValue, setSearchValue] = useState('');
-    const [edit, setEdit] = useState(false);
     const [open, setOpen] = useState(false);
 
     const [openListEnabled, setOpenListEnabled] = useState(false);
@@ -102,9 +95,6 @@ function UserBoards() {
             .then(
                 (result) => {
                     setUsers(result.data);
-                },
-                (error) => {
-                    setError(error);
                 }
             );
         console.log(users)
@@ -122,9 +112,6 @@ function UserBoards() {
             .then(
                 (result) => {
                     setAuthorities(result.data);
-                },
-                (error) => {
-                    setError(error);
                 }
             );
     }
@@ -230,13 +217,8 @@ function UserBoards() {
         getApiListAuthorities();
     }, [])
 
-    function onSearch(value) {
-        setSearchValue(value)
-    }
-
     return (
         <div>
-            <Search searchValue={searchValue} useSearch={onSearch} />
             <div className="show-items">
                 {users.map((elem) =>
                     <UserItems onUpdate={updateUser}

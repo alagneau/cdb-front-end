@@ -24,7 +24,7 @@ import './user-items.scss';
 function UserItems(props) {
 
     const [user, setUser] = useState(props.user);
-    const [copyUser, setCopyUser] = useState({...user})
+    const [copyUser, setCopyUser] = useState({ ...user })
     const [open, setOpen] = useState(false);
 
     const [authorities] = useState([{ id: 1, authority: 'ROLE_ADMIN' }, { id: 2, authority: 'ROLE_USER' }]);
@@ -73,39 +73,37 @@ function UserItems(props) {
     }
 
     const cancel = () => {
-        setCopyUser({...user})
+        setCopyUser({ ...user })
         handleClose()
     }
 
     const update = () => {
         props.onUpdate(copyUser)
-        setUser({...copyUser})
+        setUser({ ...copyUser })
         handleClose()
     }
 
     return (
         <Card className="card fade-in example-card">
             <CardContent>
-                <p className="mat-card-header">
-                    <Typography>
-                        Username
+                <Typography>
+                    Username
                         </Typography>
-                    <Typography>
-                        {user.username}
-                    </Typography>
-                    <Typography>
-                        Enabled
+                <Typography>
+                    {user.username}
+                </Typography>
+                <Typography>
+                    Enabled
                         </Typography>
-                    <Typography>
-                        {user.enabled}
-                    </Typography>
-                    <Typography>
-                        Authority
+                <Typography>
+                    {user.enabled}
+                </Typography>
+                <Typography>
+                    Authority
                         </Typography>
-                    <Typography>
-                        {user.authority.authority}
-                    </Typography>
-                </p>
+                <Typography>
+                    {user.authority.authority}
+                </Typography>
             </CardContent>
             <CardActions>
                 <Button size="small" color="primary" onClick={() => props.onResetPassword(user)} >
