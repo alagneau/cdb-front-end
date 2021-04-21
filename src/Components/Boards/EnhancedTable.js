@@ -22,6 +22,10 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SearchBar from "material-ui-search-bar";
 import ComputerRow from '../Items/ComputerRow';
 import Button from '@material-ui/core/Button';
+import { TextField } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
+import axios from 'axios';
+
 
 
 
@@ -206,9 +210,9 @@ const useToolbarStyles = makeStyles((theme) => ({
 const EnhancedTableToolbar = (props) => {
 
   const classes = useToolbarStyles();
-  const { numSelected, handleDelete } = props;
+  const { numSelected, handleDelete, handleSearch, setAddOpenedWindow } = props;
 
-
+  const [search, setSearch] = useState("");
 
 
   return (
@@ -224,6 +228,7 @@ const EnhancedTableToolbar = (props) => {
       ) : (
         <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
           Computers
+          <Button color="primary" onClick={() => setAddOpenedWindow(true)} >Add Computer</Button>
         </Typography>
       )}
 
@@ -234,7 +239,10 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       ) : ( 
-        <SearchBar />
+        <div>
+          <SearchIcon onClick={() => handleSearch(search)} />
+          <TextField onChange={(newValue) => setSearch(newValue)} />
+        </div>
       )
       }
     </Toolbar>
@@ -247,6 +255,12 @@ EnhancedTableToolbar.propTypes = {
 };
 
 
+
+
+const AddWindow = (props) => {
+  const { addWindowOpened } = props;
+
+}
 
 
 
@@ -293,18 +307,19 @@ export default function EnhancedTable() {
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState();
   const [companies, setCompanies] = useState([]);
+  const [addWindowOpened, setAddWindowOpened] = useState(false);
 
 
   const getCompanies = () => {
-    fetch(`${urlCompany}/list`,
+    axios(
       {
+        url: `${urlCompany}/list`,
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
         }
       })
-      .then( data => data.json() )
-      .then( result =>  setCompanies(result) );
+      .then( result =>  setCompanies(result.data) );
   }
 
 
@@ -348,18 +363,18 @@ export default function EnhancedTable() {
 
 
   const getApiList = () => {
-    fetch(`${urlComputer}/page/${pageNumber}/${rowsPerPage}`,
+    axios(
         {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            }
+          url: `${urlComputer}/page/${pageNumber}/${rowsPerPage}`,
+          method: 'GET',
+          headers: {
+              'Authorization': `Bearer ${token}`,
+          }
         })
-        .then(data => data.json())
         .then(
             (result) => {
               let newRows = [];
-              result.map( computer => newRows.push(createData(computer)) );
+              result.data.map( computer => newRows.push(createData(computer)) );
               setRows(newRows);
             }
         );
@@ -370,15 +385,15 @@ export default function EnhancedTable() {
 
 
   const getComputerCount = () => {
-    fetch(`${urlComputer}/count`,
+    axios(
     {
+      url: `${urlComputer}/count`,
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
       }
     })
-    .then( data => data.json() )
-    .then( result => setTotalRows( result ) );
+    .then( result => setTotalRows( result.data ) );
   }
 
 
@@ -390,17 +405,17 @@ export default function EnhancedTable() {
     let sort = order === 'asc' ? 'ASC' : 'DESC';
     let orderField = orderBy === 'company_name' ? 'company' : orderBy;
 
-    fetch(`${urlComputer}/order/page/${pageNumber}/${rowsPerPage}?orderField=${orderField}&sort=${sort}`,
+    axios(
     {
+      url: `${urlComputer}/order/page/${pageNumber}/${rowsPerPage}?orderField=${orderField}&sort=${sort}`,
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
       }
     })
-    .then( data => data.json() )
     .then( result => {
       let newRows = [];
-      result.map( computer => newRows.push(createData(computer)) );
+      result.data.map( computer => newRows.push(createData(computer)) );
       setRows(newRows);
     });
   }
@@ -472,7 +487,7 @@ export default function EnhancedTable() {
 
 
 
-  const isSelected = (name) => selected.indexOf(name) !== -1;
+  const isSelected = (id) => selected.indexOf(id) !== -1;
 
 
 
@@ -483,8 +498,9 @@ export default function EnhancedTable() {
 
     if ( selected !== [] ) {
       selected.map( id => {
-        fetch(`${urlComputer}/delete?id=${id}`,
+        axios(
         {
+          url: `${urlComputer}/delete?id=${id}`,
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -498,11 +514,9 @@ export default function EnhancedTable() {
       setSelected([]);
 
       if ( typeof orderBy === 'undefined' ) {
-        console.log('COUCOU');
         getApiList();
       }
       else {
-        console.log('COUCOU2');
         getSortedApiList();
       }
     }
@@ -525,20 +539,21 @@ export default function EnhancedTable() {
       }; 
     }
 
-    fetch(`${urlComputer}/update`, {
+    axios( {
+      url: `${urlComputer}/update`,
       method: 'PUT',
       headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({
+      data: JSON.stringify({
         company: company,
         discontinued: rowEdited.discontinued,
         id: rowEdited.id,
         introduced: rowEdited.introduced,
         name: rowEdited.name
       })
-    }).then( result => console.log(result) );
+    }).then( result => console.log(result.data) );
 
     if ( typeof orderBy === 'undefined' ) {
       getApiList();
@@ -549,11 +564,46 @@ export default function EnhancedTable() {
   }
 
 
+
+  const handleSearch = (search) => {
+
+    console.log(search.target.value);
+
+    let urlSearch = `${urlComputer}/search`;
+
+    if (typeof orderBy !== 'undefined') {
+      urlSearch = urlSearch.concat(`/order/page`); 
+    }
+    else {
+      urlSearch = urlSearch.concat(`/page`);
+    }
+
+    urlSearch = urlSearch.concat(`/${pageNumber}/${rowsPerPage}?search=${search.target.value}`);
+
+    axios( {
+      url: urlSearch,
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+      }
+    })
+    .then((result) => {
+      let searchedRows = [];
+      result.data.map( computer => searchedRows.push(createData(computer)) );
+      setRows(searchedRows);
+    });
+  }
+
+
+
   return (
     <div align="left" className={classes.root}>
+
       <Paper className={classes.paper}>
         <EnhancedTableToolbar numSelected={selected.length} 
-                              handleDelete={handleDelete} />
+                              handleDelete={handleDelete}
+                              handleSearch={handleSearch} />
         <TableContainer>
           <Table
             className={classes.table}
@@ -574,9 +624,8 @@ export default function EnhancedTable() {
             />
             <TableBody>
               {rows.map((row, index) => {
-                const isItemSelected = isSelected(row.name);
+                const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
-
                 return (
                           <ComputerRow key={row.name}
                             row={row}
