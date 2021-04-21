@@ -1,11 +1,15 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { baseURL } from '../../../libs/context';
 
 export function HomeView(props) {
     const [count, setCount] = useState(0)
+    const [name, setName] = useState("")
+    useEffect(() => {
+        handleComputers()
+    }, [])
 
-    const handleComputers = (event) => {
+    const handleComputers = () => {
         axios({
             url: baseURL + "/APIComputer/count", 
             headers: {
@@ -14,9 +18,10 @@ export function HomeView(props) {
         })
         .then(response => {
             setCount(response.data)
+            setName("computers")
         })
     }
-    const handleCompanies = (event) => {
+    const handleCompanies = () => {
         axios({
             url: baseURL + "/APICompany/count", 
             headers: {
@@ -25,16 +30,17 @@ export function HomeView(props) {
         })
         .then(response => {
             setCount(response.data)
+            setName("companies")
         })
     }
 
     return(
         <div>
-            <h2>Home page</h2>
             <div>
-                <p>Vous êtes connectés ({localStorage.getItem("username")} {localStorage.getItem("user_role")}) ! Super !</p>
+                <p>Hello {localStorage.getItem("username")} !</p>
+                <p>You are connected on CDB.</p>
             </div>
-            <p>{count}</p>
+            <p>Count of {name} : {count}</p>
             <button onClick={handleCompanies}>Companies</button>
             <button onClick={handleComputers}>Computers</button>
         </div>

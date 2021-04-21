@@ -113,7 +113,7 @@ function UserItems(props) {
                     Edit
                     </Button>
                 <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                    <DialogTitle>Formulaire de création utilisateur</DialogTitle>
+                    <DialogTitle>User creation form</DialogTitle>
                     <DialogContent>
                         <TextField
                             autoFocus
@@ -126,7 +126,7 @@ function UserItems(props) {
                             defaultValue={copyUser.username}
                             fullWidth
                             error={copyUser.username === ""}
-                            helperText={copyUser.username === "" ? 'Champ vide!' : ''}
+                            helperText={copyUser.username === "" ? 'Empty field!' : ''}
                         />
                         <List>
                             <ListItem button divider onClick={handleClickListItemEnabled}>
@@ -159,15 +159,15 @@ function UserItems(props) {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={cancel} color="primary">
-                            Annuler
+                            Cancel
                                 </Button>
                         <Button onClick={update} color="primary">
-                            Editer
+                            Edit
                                 </Button>
                     </DialogActions>
                 </Dialog>
                 <Button color="secondary" variant="outlined"
-                    size="small" onClick={() => props.onDelete(user)}>Supprimer</Button>
+                    size="small" onClick={() => props.onDelete(user)}>Delete</Button>
             </CardActions>
         </Card>
     );

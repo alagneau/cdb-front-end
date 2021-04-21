@@ -148,7 +148,7 @@ export function LoginView(props) {
             </div>
 
             <div>
-                <img style={{width: "600px"}} src="login_image.jpg" alt="Exemple d'une page du site"/>
+                <img style={{width: "600px"}} src="login_image.png" alt="Exemple d'une page du site"/>
             </div>
             {(connected==="true") && <Redirect to={props.path} {...props}/>}
         </div>

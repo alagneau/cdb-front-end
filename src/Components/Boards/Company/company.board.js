@@ -181,8 +181,8 @@ export default function CompanyBoard() {
                 {companies.map((elem) =>
                     <CompanyItem onUpdate={updateCompany}
                         company={elem} onDelete={deleteCompany} key={elem.id} />)}
-                <Button size="small" variant="outlined" color="primary" onClick={handleClickOpen}>
-                    Add a company
+                <Button style={{ "align-self": "center", "padding": "15px" }} size="small" variant="contained" color="primary" onClick={handleClickOpen}>
+                    Create a company
             </Button>
                 <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
                     <DialogTitle id="form-dialog-title">Creation form</DialogTitle>

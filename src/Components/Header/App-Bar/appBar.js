@@ -40,10 +40,10 @@ export default function ButtonAppBar() {
         textColor="primary"
         centered
       >
-        <Tab label="Accueil" />
-        <Tab label="Ordinateurs" />
-        <Tab label="Entreprises" />
-        <Tab label="Utilisateurs" />
+        <Tab label="Home" />
+        <Tab label="Computers" />
+        <Tab label="Companies" />
+        <Tab label="Users" />
         <Button variant="outlined" color="secondary" onClick={() => history.push("/logout")}>Log Out</Button>
       </Tabs>
     </Paper>
