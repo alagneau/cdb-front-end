@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Paper from '@material-ui/core/Paper';
+import { useHistory } from 'react-router-dom';
 import { Button } from '@material-ui/core';
-import { Link } from 'react-router-dom'
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,36 +19,33 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ButtonAppBar() {
+  let history = useHistory();
   const classes = useStyles();
-  const [activeRedirect, setRedirect] = useState(false)
-  let nextPath = "/test"
+  const links = ['/', '/computer', '/company', '/user']
 
-  const redirect = (link) => {
-    nextPath = link
-    setRedirect(!activeRedirect)
-    console.log(nextPath)
-    
-  }
+  const [value, setValue] = useState(0);
+
+  const handleChange = (event, newValue) => {
+    history.push(links[newValue])
+    setValue(newValue)
+  };
+
 
   return (
-    <div className={classes.root}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            <Button color="inherit" onClick={()=>{redirect("/computer")}}>Computer</Button>
-          </Typography>
-          <Typography variant="h6" className={classes.title}>
-            <Button color="inherit" onClick={()=>{redirect("/company")}}>Company</Button>
-          </Typography>
-          <Typography variant="h6" className={classes.title}>
-            <Button color="inherit" onClick={()=>{redirect("/user")}}>User</Button>
-          </Typography>
-          <Typography variant="h6" className={classes.title}>
-            <Button color="inherit" onClick={()=>{redirect("/logout")}}>Logout</Button>
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      {activeRedirect && <Redirect to={nextPath}>Test</Redirect>}
-    </div>
+    <Paper className={classes.root}>
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        indicatorColor="primary"
+        textColor="primary"
+        centered
+      >
+        <Tab label="Accueil" />
+        <Tab label="Ordinateurs" />
+        <Tab label="Entreprises" />
+        <Tab label="Utilisateurs" />
+        <Button variant="outlined" color="secondary" onClick={() => history.push("/logout")}>Log Out</Button>
+      </Tabs>
+    </Paper>
   );
 }
