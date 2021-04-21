@@ -491,6 +491,9 @@ export default function EnhancedTable() {
           }
         });
         
+        let copyRows = [...rows];
+        copyRows.splice(copyRows.indexOf(rows.find(row => row.id === id)), 1);
+        setRows(copyRows);
       });
       setSelected([]);
 
