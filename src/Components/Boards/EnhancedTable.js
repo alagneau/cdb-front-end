@@ -20,61 +20,69 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchBar from "material-ui-search-bar";
+import ComputerRow from '../Items/ComputerRow';
+import Button from '@material-ui/core/Button';
 
 
 
 function createData(computer) {
   return { 
+    id: computer.id,
     name: computer.name, 
     introduced: computer.introduced, 
     discontinued: computer.discontinued, 
+    company_id: computer.company === null ? null : computer.company.id,
     company_name: computer.company === null ? null : computer.company.name
  };
 }
 
 
-
-
-function descendingComparator(a, b, orderBy) {
-  const elem1 = orderBy === 'introduced' || orderBy === 'discontinued'
-                ? new Date(a[orderBy])
-                : a[orderBy];
-
-  const elem2 = orderBy === 'introduced' || orderBy === 'discontinued'
-                ? new Date(b[orderBy])
-                : b[orderBy];
-
-  if (elem2 < elem1 || elem1 === null) {
-    return -1;
-  }
-  if (elem2 > elem1 || elem2 === null) {
-    return 1;
-  }
-  return 0;
-}
+const urlComputer = 'http://localhost:8080/webapp/APIComputer';
+const urlCompany = 'http://localhost:8080/webapp/APICompany';
 
 
 
 
-function getComparator(order, orderBy) {
+// function descendingComparator(a, b, orderBy) {
+//   const elem1 = orderBy === 'introduced' || orderBy === 'discontinued'
+//                 ? new Date(a[orderBy])
+//                 : a[orderBy];
 
-  return order === 'desc'
-  ? (a, b) => descendingComparator(a, b, orderBy)
-  : (a, b) => -descendingComparator(a, b, orderBy);
-}
+//   const elem2 = orderBy === 'introduced' || orderBy === 'discontinued'
+//                 ? new Date(b[orderBy])
+//                 : b[orderBy];
+
+//   if (elem2 < elem1 || elem1 === null) {
+//     return -1;
+//   }
+//   if (elem2 > elem1 || elem2 === null) {
+//     return 1;
+//   }
+//   return 0;
+// }
 
 
 
 
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
+// function getComparator(order, orderBy) {
+
+//   return order === 'desc'
+//   ? (a, b) => descendingComparator(a, b, orderBy)
+//   : (a, b) => -descendingComparator(a, b, orderBy);
+// }
+
+
+
+
+// function stableSort(array, comparator) {
+//   const stabilizedThis = array.map((el, index) => [el, index]);
+//   stabilizedThis.sort((a, b) => {
+//     const order = comparator(a[0], b[0]);
+//     if (order !== 0) return order;
+//     return a[1] - b[1];
+//   });
+//   return stabilizedThis.map((el) => el[0]);
+// }
 
 
 
@@ -83,7 +91,7 @@ const headCells = [
   { id: 'name', disablePadding: true, label: 'Computer Name' },
   { id: 'introduced', disablePadding: false, label: 'Introduced Date' },
   { id: 'discontinued', disablePadding: false, label: 'Discontinued Date' },
-  { id: 'company_name', disablePadding: false, label: 'Company Name' },
+  { id: 'company_name', disablePadding: false, label: 'Company' },
 ];
 
 
@@ -105,7 +113,8 @@ const headCells = [
 function EnhancedTableHead(props) {
   
   
-  const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { classes, onSelectAllClick, order, orderBy, 
+          numSelected, rowCount, onRequestSort, setOrderBy, setOrder } = props;
   
   
   const createSortHandler = (property) => (event) => {
@@ -128,7 +137,7 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align='left' //{headCell.numeric ? 'right' : 'left'}
+            align='left' 
             padding={headCell.disablePadding ? 'none' : 'default'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -146,6 +155,9 @@ function EnhancedTableHead(props) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell>
+          <Button size="small" color="primary" onClick={() => { setOrderBy(); setOrder('asc'); }}>RESET_ORDER</Button> 
+        </TableCell>
       </TableRow>
     </TableHead>
   );
@@ -269,8 +281,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EnhancedTable() {
 
-  const url = 'http://localhost:8080/webapp/APIComputer';
-  
   const token = localStorage.getItem('access_token');
 
   const classes = useStyles();
@@ -282,18 +292,63 @@ export default function EnhancedTable() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [rows, setRows] = useState([]);
   const [totalRows, setTotalRows] = useState();
+  const [companies, setCompanies] = useState([]);
 
 
-  useEffect( () => {
+  const getCompanies = () => {
+    fetch(`${urlCompany}/list`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      })
+      .then( data => data.json() )
+      .then( result =>  setCompanies(result) );
+  }
+
+
+
+  useEffect(() => {
     getComputerCount();
   }, [])
 
   useEffect(() => {
-    getApiList();
+    getCompanies();
+  }, [])
+
+
+
+
+  useEffect(() => {
+    if ( typeof orderBy === 'undefined' ) {
+      getApiList();
+    }
+    else {
+      getSortedApiList();
+    }
   }, [pageNumber, rowsPerPage])
 
+
+
+
+
+  useEffect(() => {
+    setPageNumber(0);
+    if ( typeof orderBy === 'undefined' ) {
+      getApiList();
+    }
+    else {
+      getSortedApiList();
+    }
+  }, [orderBy, order])
+
+
+
+
+
   const getApiList = () => {
-    fetch(`${url}/page/${pageNumber}/${rowsPerPage}`,
+    fetch(`${urlComputer}/page/${pageNumber}/${rowsPerPage}`,
         {
             method: 'GET',
             headers: {
@@ -306,15 +361,16 @@ export default function EnhancedTable() {
               let newRows = [];
               result.map( computer => newRows.push(createData(computer)) );
               setRows(newRows);
-            }//,
-            // (error) => {
-            //     setError(error);
-            // }
+            }
         );
   }
 
+
+
+
+
   const getComputerCount = () => {
-    fetch(`${url}/count`,
+    fetch(`${urlComputer}/count`,
     {
       method: 'GET',
       headers: {
@@ -326,6 +382,32 @@ export default function EnhancedTable() {
   }
 
 
+
+
+
+  const getSortedApiList = () => {
+    
+    let sort = order === 'asc' ? 'ASC' : 'DESC';
+    let orderField = orderBy === 'company_name' ? 'company' : orderBy;
+
+    fetch(`${urlComputer}/order/page/${pageNumber}/${rowsPerPage}?orderField=${orderField}&sort=${sort}`,
+    {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
+    })
+    .then( data => data.json() )
+    .then( result => {
+      let newRows = [];
+      result.map( computer => newRows.push(createData(computer)) );
+      setRows(newRows);
+    });
+  }
+
+
+
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -333,9 +415,11 @@ export default function EnhancedTable() {
   };
 
 
+
+
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.name);
+      const newSelecteds = rows.map((row) => row.id);
       setSelected(newSelecteds);
       return;
     }
@@ -392,20 +476,78 @@ export default function EnhancedTable() {
 
 
 
-  //const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - pageNumber * rowsPerPage);
 
-
-
+  // TO CHANGE
   const handleDelete = () => {
-    setRows(rows.filter( computer => !selected.includes(computer.name) ));
-    setSelected([]);
+    console.log(selected);
+
+    if ( selected !== [] ) {
+      selected.map( id => {
+        fetch(`${urlComputer}/delete?id=${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+        
+      });
+      setSelected([]);
+
+      if ( typeof orderBy === 'undefined' ) {
+        console.log('COUCOU');
+        getApiList();
+      }
+      else {
+        console.log('COUCOU2');
+        getSortedApiList();
+      }
+    }
   }
 
 
 
+
+  const handleEdit = (rowEdited) => {
+    console.log('Inside edit');
+    console.log(rowEdited);
+    
+    let company = null;
+    if ( rowEdited.company_id !== null && rowEdited.company_name !== null ) {
+      console.log('company creation');
+      company = { 
+        id: rowEdited.company_id, 
+        logo: null,
+        name: rowEdited.company_name 
+      }; 
+    }
+
+    fetch(`${urlComputer}/update`, {
+      method: 'PUT',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        company: company,
+        discontinued: rowEdited.discontinued,
+        id: rowEdited.id,
+        introduced: rowEdited.introduced,
+        name: rowEdited.name
+      })
+    }).then( result => console.log(result) );
+
+    if ( typeof orderBy === 'undefined' ) {
+      getApiList();
+    }
+    else {
+      getSortedApiList();
+    }
+  }
+
+
   return (
     <div align="left" className={classes.root}>
-      <button onClick={() => { setOrderBy(); setOrder('asc'); }}>RESET ORDER</button> 
       <Paper className={classes.paper}>
         <EnhancedTableToolbar numSelected={selected.length} 
                               handleDelete={handleDelete} />
@@ -424,38 +566,24 @@ export default function EnhancedTable() {
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
+              setOrderBy={setOrderBy}
+              setOrder={setOrder}
             />
             <TableBody>
-              {stableSort(rows, getComparator(order, orderBy))
-                .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+              {rows.map((row, index) => {
+                const isItemSelected = isSelected(row.name);
+                const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
-                    <TableRow
-                      hover
-                      onClick={(event) => handleClick(event, row.name)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.name}
-                      selected={isItemSelected}
-                    >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isItemSelected}
-                          inputProps={{ 'aria-labelledby': labelId }}
-                        />
-                      </TableCell>
-                      <TableCell component="th" align='left' id={labelId} scope="row" padding="none">
-                        {row.name}
-                      </TableCell>
-                      <TableCell align="left">{row.introduced}</TableCell>
-                      <TableCell align="left">{row.discontinued}</TableCell>
-                      <TableCell align="left">{row.company_name}</TableCell>
-                    </TableRow>
-                  );
-                })}
+                return (
+                          <ComputerRow key={row.name}
+                            row={row}
+                            companies={companies}
+                            isItemSelected={isItemSelected}
+                            labelId={labelId}
+                            handleClick={handleClick}
+                            handleEdit={handleEdit} />
+                );
+              })}
               {/* {emptyRows > 0 && (
                 <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
                   <TableCell colSpan={6} />

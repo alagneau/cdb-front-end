@@ -1,5 +1,4 @@
 import './App.css';
-import ComputerBoard from './Components/Boards/ComputerBoard';
 import EnhancedTable from './Components/Boards/EnhancedTable';
 import { BrowserRouter, Switch } from 'react-router-dom'
 import { HomeView } from './Components/Views/Home/home.view';
