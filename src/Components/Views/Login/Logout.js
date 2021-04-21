@@ -5,7 +5,7 @@ export function Logout() {
     localStorage.setItem("access_token", "")
     localStorage.setItem("refresh_token", "")
     localStorage.setItem("user_role", "")
-    localStorage.setItem("login_message", "Déconnexion réussie")
+    localStorage.setItem("login_message", "Deconnection ok")
     localStorage.setItem("connected", "")
 
     return (

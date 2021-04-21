@@ -25,6 +25,7 @@ import Button from '@material-ui/core/Button';
 import { TextField } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import axios from 'axios';
+import { baseURL } from '../../libs/context';
 
 
 
@@ -41,8 +42,8 @@ function createData(computer) {
 }
 
 
-const urlComputer = 'http://localhost:8080/webapp/APIComputer';
-const urlCompany = 'http://localhost:8080/webapp/APICompany';
+const urlComputer = baseURL + '/APIComputer';
+const urlCompany = baseURL + '/APICompany';
 
 
 

@@ -16,13 +16,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import axios from 'axios';
+import { baseURL } from '../../../libs/context';
 
 function UserBoards() {
 
 
-    const url = 'http://localhost:8080/webapp/APIUser';
+    const url = baseURL + '/APIUser';
     const [users, setUsers] = useState([]);
-    const url_authorities = 'http://localhost:8080/webapp/APIAuthorities';
+    const url_authorities = baseURL + '/APIAuthorities';
     const [authorities, setAuthorities] = useState([])
 
     const [open, setOpen] = useState(false);

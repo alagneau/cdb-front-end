@@ -95,7 +95,7 @@ export function LoginView(props) {
                     handleConnected("true")
                 }
             }).catch(error => {
-                setInfoMessage("Mauvaise combinaison username / password")
+                setInfoMessage("Wrong username / password")
             })
     }
 
@@ -148,7 +148,7 @@ export function LoginView(props) {
             </div>
 
             <div>
-                <img style={{width: "600px"}} src="login_image.png" alt="Exemple d'une page du site"/>
+                <img style={{width: "600px"}} src="login_image.png" alt="Example of a webpage"/>
             </div>
             {(connected==="true") && <Redirect to={props.path} {...props}/>}
         </div>
