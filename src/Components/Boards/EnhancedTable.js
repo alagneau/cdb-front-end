@@ -477,7 +477,7 @@ export default function EnhancedTable() {
 
 
 
-  const isSelected = (name) => selected.indexOf(name) !== -1;
+  const isSelected = (id) => selected.indexOf(id) !== -1;
 
 
 
@@ -503,11 +503,9 @@ export default function EnhancedTable() {
       setSelected([]);
 
       if ( typeof orderBy === 'undefined' ) {
-        console.log('COUCOU');
         getApiList();
       }
       else {
-        console.log('COUCOU2');
         getSortedApiList();
       }
     }
@@ -615,7 +613,7 @@ export default function EnhancedTable() {
             />
             <TableBody>
               {rows.map((row, index) => {
-                const isItemSelected = isSelected(row.name);
+                const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
                 return (
                           <ComputerRow key={row.name}
