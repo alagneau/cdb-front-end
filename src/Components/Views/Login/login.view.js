@@ -16,18 +16,31 @@ import axios from 'axios';
 import {Redirect} from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
+    page: {
+        display: 'flex',
+        "justify-content": "space-evenly",
+        flexWrap: 'wrap',
+        "align-items": "stretch",
+        // "height": "100%"
+    },
     root: {
-      display: 'flex',
-      flexWrap: 'wrap',
+        display: 'flex',
+        // flexWrap: 'wrap',
+        "flex-direction": "column",
+        "align-items": "begin",
+        "max-width": "240px"
+    },
+    item: {
+
     },
     margin: {
-      margin: theme.spacing(1),
+        margin: theme.spacing(1),
     },
     withoutLabel: {
-      marginTop: theme.spacing(3),
+        marginTop: theme.spacing(3),
     },
     textField: {
-      width: '25ch',
+        width: '25ch',
     }
 }))
 
@@ -41,12 +54,15 @@ export function LoginView(props) {
     })
 
     const [connected, setConnected] = useState(localStorage.getItem("connected"))
+    const [info_message, setInfoMessage] = useState(localStorage.getItem("login_message"))
 
     const handleChangeName = (event) => {
+        setInfoMessage("")
         setUser({...user, "username": event.target.value})
         localStorage.setItem("username", event.target.value)
     };
     const handleChangePassword = (event) => {
+        setInfoMessage("")
         setUser({...user, "password": event.target.value})
     };
 
@@ -64,6 +80,7 @@ export function LoginView(props) {
     };
 
     const handleSubmit = () => {
+        localStorage.setItem("login_message", "")
         axios.post(baseURL + "/login/Oauth",
             {
                 username: user.username,
@@ -74,19 +91,20 @@ export function LoginView(props) {
                     setUser({...user, "password": ""})
                     localStorage.setItem("access_token", response.data.access_token)
                     localStorage.setItem("refresh_token", response.data.refresh_token)
+                    localStorage.setItem("user_role", response.data.role)
                     handleConnected("true")
                 }
             }).catch(error => {
-                console.log(error)
+                setInfoMessage("Mauvaise combinaison username / password")
             })
     }
 
     return(
-        <div>
-            <h2>Login page</h2>
+        <div className={classes.page}>
             <div>
                 <form onSubmit={() => handleSubmit()} action="">
                 <div className={classes.root}>
+                    <h2>Login page</h2>
                     <div>
                         <TextField
                             label="Username"
@@ -121,11 +139,16 @@ export function LoginView(props) {
                         />
                         </FormControl>
                     </div>
+                    <span>{info_message}</span>
                     <div>
                         <Button onClick={() => handleSubmit()}>Log In</Button>
                     </div>
                 </div>
                 </form>
+            </div>
+
+            <div>
+                <img style={{width: "600px"}} src="login_image.jpg" alt="Exemple d'une page du site"/>
             </div>
             {(connected==="true") && <Redirect to={props.path} {...props}/>}
         </div>
