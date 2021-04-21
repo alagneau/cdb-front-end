@@ -223,11 +223,11 @@ function UserBoards() {
                 {users.map((elem) =>
                     <UserItems onUpdate={updateUser}
                         authorities={authorities} user={elem} onDelete={deleteUser} onResetPassword={resetPassword} key={elem.id} />)}
-                <Button size="small" variant="outlined" color="primary" onClick={handleClickOpen}>
-                    Créer un utilisateur
-            </Button>
+                <Button style={{ "align-self": "center", "padding": "15px" }} variant="contained" size="small" color="primary" onClick={handleClickOpen}>
+                    Create a user
+                </Button>
                 <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                    <DialogTitle>Formulaire de création utilisateur</DialogTitle>
+                    <DialogTitle>User creation form</DialogTitle>
                     <DialogContent>
                         <TextField
                             autoFocus
@@ -239,7 +239,7 @@ function UserBoards() {
                             onChange={usernameFormHandler}
                             fullWidth
                             error={userToDB.username === ""}
-                            helperText={userToDB.username === "" ? 'Champ vide!' : ''}
+                            helperText={userToDB.username === "" ? 'Empty field!' : ''}
                         />
                         <List key="enabledList">
                             <ListItem button divider onClick={handleClickListItemEnabled}>
@@ -269,11 +269,11 @@ function UserBoards() {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleClose} color="primary">
-                            Annuler
-                    </Button>
+                            Cancel
+                        </Button>
                         <Button disabled={!userToDB.username} onClick={createUser} color="primary">
-                            Ajouter
-                    </Button>
+                            Create
+                        </Button>
                     </DialogActions>
                 </Dialog>
             </div>
