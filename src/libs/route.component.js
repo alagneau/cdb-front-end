@@ -6,7 +6,7 @@ import { LoginView } from '../Components/Views/Login/login.view';
 
 export function RouteCDB({ component: Component, ...rest }) {
     const connected = localStorage.getItem("connected")
-    rest.update(connected === "true")
+    rest.update()
     return(
         <Route
         {...rest}

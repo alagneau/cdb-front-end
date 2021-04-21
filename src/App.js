@@ -41,18 +41,21 @@ function App() {
         });
     }, [])
     const [draw, setDraw] = useState(localStorage.getItem("connected")==="true")
+    const handleHeader = () => {
+        setDraw(localStorage.getItem("connected")==="true")
+    }
 
     return (
         <BrowserRouter>
             <div className="App">
                 {draw && <AppBar />}
                 <Switch>
-                    <RouteCDB exact path="/" component={HomeView} update={setDraw}/>
-                    <RouteCDB exact path="/computer" component={HomeView} update={setDraw}/>
-                    <RouteCDB exact path="/company" component={HomeView} update={setDraw}/>
-                    <RouteCDB exact path="/user" component={HomeView} update={setDraw}/>
-                    <RouteCDB exact path="/logout" component={Logout} update={setDraw}/>
-                    <RouteCDB path="/" component={HomeView} update={setDraw}/>
+                    <RouteCDB exact path="/" component={HomeView} update={handleHeader}/>
+                    <RouteCDB exact path="/computer" component={HomeView} update={handleHeader}/>
+                    <RouteCDB exact path="/company" component={HomeView} update={handleHeader}/>
+                    <RouteCDB exact path="/user" component={HomeView} update={handleHeader}/>
+                    <RouteCDB exact path="/logout" component={Logout} update={handleHeader}/>
+                    <RouteCDB path="/" component={HomeView} update={handleHeader}/>
                 </Switch>
             </div>
         </BrowserRouter>
